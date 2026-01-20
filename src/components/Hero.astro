@@ -1,0 +1,29 @@
+---
+import { Image } from "astro:assets";
+import char from "../assets/Char.svg";
+---
+
+<section class=" text-white px-6 lg:px-12 pt-16 lg:pt-24 relative">
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+    <div class="flex-1 space-y-6">
+      <h1 style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 124.64px; line-height: 104px; letter-spacing: -0.04em; vertical-align: middle; width: 548px; height: 204px; top: 308px; left: 182px; opacity: 1;">
+        WELCOME TO<br />PROJECT LIKHA
+      </h1>
+      <p class="text-lg lg:text-xl text-gray-300">
+        A community for tech enthusiasts and programmers.
+      </p>
+      <button class="bg-white text-black rounded-md py-3 px-6 hover:bg-gray-100 transition-colors font-medium">
+        Explore now
+      </button>
+    </div>
+    <div class="flex-1 flex justify-center lg:justify-end">
+      <Image
+        src={char}
+        alt="Character illustration"
+        width={524}
+        height={684}
+        style="width: 524px; height: 684px;"
+      />
+    </div>
+  </div>
+</section>

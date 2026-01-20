@@ -1,0 +1,29 @@
+---
+import { Image } from "astro:assets";
+import aboutUs from "../assets/about-us.png";
+---
+
+<section class="rounded-md bg-neutral-900 mb-5 bg-gray-100 px-6 mx-6 lg:px-12 pb-16 lg:pb-24  " >
+  <div class="max-w-7xl mx-auto bg-gray-100 py-10 px-10 rounded-md">
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+      <div class="flex-1">
+        <div class="w-full w-full bg-gray-300 rounded-lg flex items-center justify-center">
+         <Image src="/assets/about-us.png" alt="About Us" width={500} height={500} />
+        </div>
+      </div>
+      <div class="flex-1">
+        <h2 class="text-gray-900 mb-8" style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 113.42px; line-height: 94.64px; letter-spacing: -0.04em; vertical-align: middle;">
+          ABOUT US
+        </h2>
+        <div class="space-y-6 text-gray-800">
+          <p style="font-family: 'Montserrat', sans-serif; font-weight: 600; font-style: normal; font-size: 21.84px; line-height: 20.02px; letter-spacing: -0.04em;">
+            Project Likha is an open, community-driven space for tech enthusiasts, programmers, artists, and digital creators who believe in learning through sharing. It brings together people from different backgrounds to explore, create, and grow through shared knowledge.
+          </p>
+          <p style="font-family: 'Montserrat', sans-serif; font-weight: 600; font-style: normal; font-size: 21.84px; line-height: 20.02px; letter-spacing: -0.04em;">
+            There is no central founder - everyone participates as equals. Project Likha blends art and technology, encouraging collaboration where creativity meets code and ideas turn into meaningful learning.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
