@@ -1,5 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import prisma from "../../lib/prisma";
+
+const blogs = await prisma.blog.findMany();
 ---
 
 <Layout title="PL blogs">
@@ -16,6 +19,8 @@ import Layout from "../../layouts/Layout.astro";
         technology, science and many more.
       </p>
     </div>
+    
+<pre>{JSON.stringify(blogs, null, 2)}</pre>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       <!-- Placeholder Blog Card 1 -->

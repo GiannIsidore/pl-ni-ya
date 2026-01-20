@@ -6,11 +6,20 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "studio": "bunx prisma studio --config ./prisma.config.ts",
+    "studio:direct": "bunx prisma studio --url=\"mysql://root:1515@127.0.0.1:3306/pl_db\""
   },
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.2.0",
+    "@prisma/client": "^7.2.0",
     "@tailwindcss/vite": "^4.1.18",
+    "@types/node": "^25.0.9",
     "astro": "^5.16.11",
+    "dotenv": "^17.2.3",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "prisma": "^7.2.0"
   }
 }
