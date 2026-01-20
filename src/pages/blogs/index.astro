@@ -2,7 +2,30 @@
 import Layout from "../../layouts/Layout.astro";
 import prisma from "../../lib/prisma";
 
-const blogs = await prisma.blog.findMany();
+const blogs = await prisma.blog.findMany({
+  orderBy: {
+    createdAt: 'desc'
+  }
+});
+
+
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  });
+}
+
+
+function formatViews(views: number): string {
+  if (views >= 1000000) {
+    return `${(views / 1000000).toFixed(1)}M`;
+  } else if (views >= 1000) {
+    return `${(views / 1000).toFixed(1)}K`;
+  }
+  return views.toString();
+}
 ---
 
 <Layout title="PL blogs">
@@ -20,208 +43,53 @@ const blogs = await prisma.blog.findMany();
       </p>
     </div>
     
-<pre>{JSON.stringify(blogs, null, 2)}</pre>
-    
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-      <!-- Placeholder Blog Card 1 -->
-      <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-        <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-          <span class="text-neutral-500 text-sm">Image Placeholder</span>
-        </div>
-        <div class="p-6 flex-1 flex flex-col">
-          <h3 class="text-white font-semibold text-xl mb-3">
-            Blog Post Title Placeholder
-          </h3>
-          <p class="text-gray-400 text-sm mb-4 flex-1">
-            It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum...
-          </p>
-          <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              2026-01-25
-            </span>
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              1.4M views
-            </span>
+      {blogs.map((blog) => (
+        <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
+          {blog.image ? (
+            <img 
+              src={blog.image} 
+              alt={blog.title}
+              class="w-full h-48 object-cover"
+            />
+          ) : (
+            <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
+              <span class="text-neutral-500 text-sm">No Image</span>
+            </div>
+          )}
+          <div class="p-6 flex-1 flex flex-col">
+            <h3 class="text-white font-semibold text-xl mb-3">
+              {blog.title}
+            </h3>
+            <p class="text-gray-400 text-sm mb-4 flex-1">
+              {blog.excerpt}
+            </p>
+            <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {formatDate(blog.createdAt)}
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                {formatViews(blog.views)} views
+              </span>
+            </div>
+            <a 
+              href={`/blogs/${blog.slug}`}
+              class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium text-center"
+            >
+              Read more
+            </a>
           </div>
-          <button class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium">
-            Read more
-          </button>
-        </div>
-      </article>
-
-      <!-- Placeholder Blog Card 2 -->
-      <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-        <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-          <span class="text-neutral-500 text-sm">Image Placeholder</span>
-        </div>
-        <div class="p-6 flex-1 flex flex-col">
-          <h3 class="text-white font-semibold text-xl mb-3">
-            Blog Post Title Placeholder
-          </h3>
-          <p class="text-gray-400 text-sm mb-4 flex-1">
-            It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum...
-          </p>
-          <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              2026-01-25
-            </span>
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              1.4M views
-            </span>
-          </div>
-          <button class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium">
-            Read more
-          </button>
-        </div>
-      </article>
-
-      <!-- Placeholder Blog Card 3 -->
-      <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-        <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-          <span class="text-neutral-500 text-sm">Image Placeholder</span>
-        </div>
-        <div class="p-6 flex-1 flex flex-col">
-          <h3 class="text-white font-semibold text-xl mb-3">
-            Blog Post Title Placeholder
-          </h3>
-          <p class="text-gray-400 text-sm mb-4 flex-1">
-            It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum...
-          </p>
-          <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              2026-01-25
-            </span>
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              1.4M views
-            </span>
-          </div>
-          <button class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium">
-            Read more
-          </button>
-        </div>
-      </article>
+        </article>
+      ))}
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mt-1">
-        <!-- Placeholder Blog Card 1 -->
-        <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-          <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-            <span class="text-neutral-500 text-sm">Image Placeholder</span>
-          </div>
-          <div class="p-6 flex-1 flex flex-col">
-            <h3 class="text-white font-semibold text-xl mb-3">
-              Blog Post Title Placeholder
-            </h3>
-            <p class="text-gray-400 text-sm mb-4 flex-1">
-              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum...
-            </p>
-            <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                2026-01-25
-              </span>
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                1.4M views
-              </span>
-            </div>
-            <button class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium">
-              Read more
-            </button>
-          </div>
-        </article>
   
-        <!-- Placeholder Blog Card 2 -->
-        <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-          <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-            <span class="text-neutral-500 text-sm">Image Placeholder</span>
-          </div>
-          <div class="p-6 flex-1 flex flex-col">
-            <h3 class="text-white font-semibold text-xl mb-3">
-              Blog Post Title Placeholder
-            </h3>
-            <p class="text-gray-400 text-sm mb-4 flex-1">
-              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum...
-            </p>
-            <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                2026-01-25
-              </span>
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                1.4M views
-              </span>
-            </div>
-            <button class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium">
-              Read more
-            </button>
-          </div>
-        </article>
-  
-        <!-- Placeholder Blog Card 3 -->
-        <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-          <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-            <span class="text-neutral-500 text-sm">Image Placeholder</span>
-          </div>
-          <div class="p-6 flex-1 flex flex-col">
-            <h3 class="text-white font-semibold text-xl mb-3">
-              Blog Post Title Placeholder
-            </h3>
-            <p class="text-gray-400 text-sm mb-4 flex-1">
-              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum...
-            </p>
-            <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                2026-01-25
-              </span>
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                1.4M views
-              </span>
-            </div>
-            <button class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium">
-              Read more
-            </button>
-          </div>
-        </article>
-      </div>
   </div>
 </section>
 
