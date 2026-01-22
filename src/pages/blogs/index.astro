@@ -5,7 +5,10 @@ import prisma from "../../lib/prisma";
 const blogs = await prisma.blog.findMany({
   orderBy: {
     createdAt: 'desc'
-  }
+  },
+  include: {
+    image: true,       
+  },
 });
 
 
@@ -46,9 +49,9 @@ function formatViews(views: number): string {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       {blogs.map((blog) => (
         <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-          {blog.image ? (
+          {blog.image && blog.image.length > 0 ? (
             <img 
-              src={blog.image} 
+            src={blog.image[0].url} 
               alt={blog.title}
               class="w-full h-48 object-cover"
             />

@@ -13,8 +13,17 @@ model Blog {
   title     String
   excerpt   String   @db.Text
   content   String   @db.LongText
-  image     String?
   views     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  image     Image[]
+}
+
+model Image {
+  id     Int    @id @default(autoincrement())
+  url    String
+  blogId Int
+  blog   Blog   @relation(fields: [blogId], references: [id])
+
+  @@index([blogId], map: "Image_blogId_fkey")
 }
