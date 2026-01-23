@@ -1,0 +1,107 @@
+---
+---
+
+<div class="under-construction-badge">
+  <div class="badge-content">
+    <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+    </svg>
+    <span class="badge-text">UNDER CONSTRUCTION</span>
+  </div>
+</div>
+
+<style>
+  .under-construction-badge {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    animation: fadeInPulse 0.6s ease-in-out;
+  }
+
+  .badge-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    border: 2px solid #991b1b;
+    border-radius: 8px;
+    padding: 10px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+  }
+
+  .badge-icon {
+    width: 18px;
+    height: 18px;
+    color: #ffffff;
+    flex-shrink: 0;
+    animation: rotate 3s linear infinite;
+  }
+
+  .badge-text {
+    color: #ffffff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  @keyframes fadeInPulse {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.9);
+    }
+    50% {
+      transform: translateY(0) scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .under-construction-badge {
+      top: 10px;
+      right: 10px;
+    }
+
+    .badge-content {
+      padding: 8px 12px;
+      gap: 6px;
+    }
+
+    .badge-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .badge-text {
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .badge-text {
+      font-size: 11px;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-content {
+      padding: 6px 10px;
+    }
+  }
+</style>
