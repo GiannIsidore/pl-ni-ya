@@ -426,20 +426,24 @@ const editorId = `thread-editor-${Math.random().toString(36).substr(2, 9)}`;
           submitBtn.innerHTML = 'Creating...';
 
           try {
-            const authorId = 1; // Placeholder - in real app, get from session/auth
-
             const response = await fetch(`/api/forums/${forumSlug}/threads`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 title,
                 content,
-                authorId,
               }),
             });
 
             if (!response.ok) {
               const error = await response.json();
+              if (response.status === 401) {
+                // Show login modal or redirect
+                if (confirm('You need to be logged in to create a thread. Would you like to log in?')) {
+                  window.location.href = `/login?returnUrl=${encodeURIComponent(window.location.pathname)}`;
+                }
+                return;
+              }
               throw new Error(error.error || 'Failed to create thread');
             }
 

@@ -1,11 +1,14 @@
 import type { APIRoute } from 'astro';
 import prisma from '../../../../lib/prisma';
+import { getCurrentUserId } from '../../../../lib/auth-helpers';
 
 // GET /api/threads/[threadId]/likes - Get all likes for a thread
-export const GET: APIRoute = async ({ params, url }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   try {
     const threadId = parseInt(params.threadId!);
-    const userId = url.searchParams.get('userId');
+    
+    // Get current user if authenticated (for hasLiked check)
+    const currentUserId = await getCurrentUserId(request);
 
     // Verify thread exists
     const thread = await prisma.thread.findUnique({
@@ -37,8 +40,8 @@ export const GET: APIRoute = async ({ params, url }) => {
 
     // Check if current user has liked
     let hasLiked = false;
-    if (userId) {
-      hasLiked = likes.some(like => like.userId === parseInt(userId));
+    if (currentUserId) {
+      hasLiked = likes.some(like => like.userId === currentUserId);
     }
 
     // Format "who liked" display

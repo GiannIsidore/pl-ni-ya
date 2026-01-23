@@ -7,7 +7,7 @@ interface Comment {
   content: string;
   createdAt: Date;
   author: {
-    id: number;
+    id: string;
     username: string;
     avatar?: string | null;
   };
@@ -21,6 +21,7 @@ interface Props {
 }
 
 const { comment, threadId, depth = 0 } = Astro.props;
+const { user } = Astro.locals;
 
 function formatDate(date: Date): string {
   const d = new Date(date);
@@ -205,16 +206,21 @@ if (likeCount === 1) {
           const commentId = likeBtn.getAttribute('data-comment-id');
           if (!commentId) return;
           
-          const userId = 1; // Placeholder - get from auth in real app
-          
           try {
             const response = await fetch('/api/likes', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId, commentId: parseInt(commentId) }),
+              body: JSON.stringify({ commentId: parseInt(commentId) }),
             });
             
             if (!response.ok) {
+              if (response.status === 401) {
+                // Show login modal or redirect
+                if (confirm('You need to be logged in to like posts. Would you like to log in?')) {
+                  window.location.href = `/login?returnUrl=${encodeURIComponent(window.location.pathname)}`;
+                }
+                return;
+              }
               throw new Error('Failed to toggle like');
             }
             

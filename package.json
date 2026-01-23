@@ -7,13 +7,14 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "studio": "bunx prisma studio --config ./prisma.config.ts",
+    "studio": "bunx prisma studio --url=\"${DATABASE_URL}\"",
+    "studio:config": "bunx prisma studio --config=./prisma.config.ts",
     "studio:direct": "bunx prisma studio --url=\"mysql://root:1515@127.0.0.1:3306/pl_db\""
   },
   "dependencies": {
     "@astrojs/node": "^9.5.2",
-    "@prisma/adapter-mariadb": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/adapter-mariadb": "^7.3.0",
+    "@prisma/client": "^7.3.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tiptap/core": "^3.16.0",
     "@tiptap/extension-code-block-lowlight": "^3.17.0",
@@ -27,11 +28,12 @@
     "@tiptap/starter-kit": "^3.16.0",
     "@types/node": "^25.0.9",
     "astro": "^5.16.11",
+    "better-auth": "^1.4.17",
     "dotenv": "^17.2.3",
     "lowlight": "^3.3.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "prisma": "^7.2.0"
+    "prisma": "^7.3.0"
   }
 }

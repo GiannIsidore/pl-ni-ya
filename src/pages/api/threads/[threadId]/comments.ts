@@ -1,15 +1,22 @@
 import type { APIRoute } from 'astro';
 import prisma from '../../../../lib/prisma';
+import { getCurrentUserId, unauthorizedResponse } from '../../../../lib/auth-helpers';
 
 export const POST: APIRoute = async ({ params, request }) => {
   try {
+    // Get authenticated user
+    const userId = await getCurrentUserId(request);
+    if (!userId) {
+      return unauthorizedResponse();
+    }
+
     const threadId = parseInt(params.threadId!);
     const body = await request.json();
-    const { content, authorId, parentId } = body;
+    const { content, parentId } = body;
 
-    if (!content || !authorId) {
+    if (!content) {
       return new Response(
-        JSON.stringify({ error: 'Content and authorId are required' }),
+        JSON.stringify({ error: 'Content is required' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -44,7 +51,7 @@ export const POST: APIRoute = async ({ params, request }) => {
       data: {
         content,
         threadId,
-        authorId: parseInt(authorId),
+        authorId: userId,
         parentId: parentId ? parseInt(parentId) : null,
       },
       include: {

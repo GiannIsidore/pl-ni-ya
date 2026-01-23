@@ -1,18 +1,18 @@
 import type { APIRoute } from 'astro';
 import prisma from '../../../lib/prisma';
+import { getCurrentUserId, unauthorizedResponse } from '../../../lib/auth-helpers';
 
 // POST /api/likes - Toggle like on a thread or comment
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await request.json();
-    const { userId, threadId, commentId } = body;
-
+    // Get authenticated user
+    const userId = await getCurrentUserId(request);
     if (!userId) {
-      return new Response(
-        JSON.stringify({ error: 'userId is required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse();
     }
+
+    const body = await request.json();
+    const { threadId, commentId } = body;
 
     if (!threadId && !commentId) {
       return new Response(
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Check if like already exists
     const existingLike = await prisma.like.findFirst({
       where: {
-        userId: parseInt(userId),
+        userId,
         ...(threadId ? { threadId: parseInt(threadId) } : {}),
         ...(commentId ? { commentId: parseInt(commentId) } : {}),
       },
@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
       // Like - create new like
       const like = await prisma.like.create({
         data: {
-          userId: parseInt(userId),
+          userId,
           ...(threadId ? { threadId: parseInt(threadId) } : {}),
           ...(commentId ? { commentId: parseInt(commentId) } : {}),
         },
@@ -88,11 +88,13 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 // GET /api/likes?threadId=X or ?commentId=X - Get likes for a thread or comment
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ request, url }) => {
   try {
     const threadId = url.searchParams.get('threadId');
     const commentId = url.searchParams.get('commentId');
-    const userId = url.searchParams.get('userId');
+    
+    // Get current user if authenticated (for hasLiked check)
+    const currentUserId = await getCurrentUserId(request);
 
     if (!threadId && !commentId) {
       return new Response(
@@ -122,8 +124,8 @@ export const GET: APIRoute = async ({ url }) => {
 
     // Check if current user has liked
     let hasLiked = false;
-    if (userId) {
-      hasLiked = likes.some(like => like.userId === parseInt(userId));
+    if (currentUserId) {
+      hasLiked = likes.some(like => like.userId === currentUserId);
     }
 
     // Format "who liked" display

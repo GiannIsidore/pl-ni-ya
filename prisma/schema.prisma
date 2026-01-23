@@ -29,13 +29,64 @@ model Image {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  username  String    @unique
-  avatar    String?
-  createdAt DateTime  @default(now())
-  threads   Thread[]
-  comments  Comment[]
-  likes     Like[]
+  id            String    @id
+  username      String    @unique
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String?
+  avatar        String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  comments      Comment[]
+  likes         Like[]
+  sessions      Session[]
+  threads       Thread[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
 }
 
 model Forum {
@@ -51,19 +102,19 @@ model Forum {
 }
 
 model Thread {
-  id          Int       @id @default(autoincrement())
-  title       String
-  content     String    @db.LongText
-  slug        String    @unique
-  forumId     Int
-  authorId    Int
-  views       Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  forum       Forum     @relation(fields: [forumId], references: [id])
-  author      User      @relation(fields: [authorId], references: [id])
-  comments    Comment[]
-  likes       Like[]
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String    @db.LongText
+  slug      String    @unique
+  forumId   Int
+  authorId  String
+  views     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+  likes     Like[]
+  author    User      @relation(fields: [authorId], references: [id])
+  forum     Forum     @relation(fields: [forumId], references: [id])
 
   @@index([forumId])
   @@index([slug])
@@ -74,14 +125,14 @@ model Comment {
   id        Int       @id @default(autoincrement())
   content   String    @db.LongText
   threadId  Int
-  authorId  Int
+  authorId  String
   parentId  Int?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  thread    Thread    @relation(fields: [threadId], references: [id])
   author    User      @relation(fields: [authorId], references: [id])
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies   Comment[] @relation("CommentReplies")
+  thread    Thread    @relation(fields: [threadId], references: [id])
   likes     Like[]
 
   @@index([threadId])
@@ -90,18 +141,18 @@ model Comment {
 }
 
 model Like {
-  id        Int       @id @default(autoincrement())
-  userId    Int
+  id        Int      @id @default(autoincrement())
+  userId    String
   threadId  Int?
   commentId Int?
-  createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id])
-  thread    Thread?   @relation(fields: [threadId], references: [id])
-  comment   Comment?  @relation(fields: [commentId], references: [id])
+  createdAt DateTime @default(now())
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  thread    Thread?  @relation(fields: [threadId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
+  @@unique([userId, threadId])
+  @@unique([userId, commentId])
   @@index([userId])
   @@index([threadId])
   @@index([commentId])
-  @@unique([userId, threadId])
-  @@unique([userId, commentId])
 }
