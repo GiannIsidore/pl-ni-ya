@@ -16,10 +16,49 @@ const forums = await prisma.forum.findMany({
   },
 });
 
+// Fetch latest threads from all forums
+const latestThreads = await prisma.thread.findMany({
+  include: {
+    author: {
+      select: {
+        username: true,
+        avatar: true,
+      },
+    },
+    forum: {
+      select: {
+        name: true,
+        slug: true,
+      },
+    },
+    _count: {
+      select: {
+        comments: true,
+      },
+    },
+  },
+  orderBy: {
+    updatedAt: 'desc',
+  },
+  take: 8,
+});
+
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('en-US', { 
+  const d = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  
+  return d.toLocaleDateString('en-US', { 
     year: 'numeric', 
-    month: 'long', 
+    month: 'short', 
     day: 'numeric' 
   });
 }
@@ -43,34 +82,94 @@ function formatDate(date: Date): string {
         </p>
       </div>
 
+      <!-- Latest Threads Section -->
+      {latestThreads.length > 0 && (
+        <div class="mb-16">
+          <h3 
+            class="text-white mb-6" 
+            style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 48px; line-height: 1.2; letter-spacing: -0.02em;"
+          >
+            Latest Threads
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {latestThreads.map((thread) => (
+              <a 
+                href={`/forums/${thread.forum.slug}/${thread.slug}`}
+                class="bg-neutral-800 rounded-lg border border-neutral-700 p-4 hover:border-neutral-600 hover:bg-neutral-750 transition-all duration-300 group"
+              >
+                <div class="flex items-start gap-3 mb-2">
+                  {thread.author.avatar ? (
+                    <img 
+                      src={thread.author.avatar} 
+                      alt={thread.author.username}
+                      class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div class="w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-4 h-4 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                  <div class="flex-1 min-w-0">
+                    <p class="text-white text-sm font-semibold truncate group-hover:text-blue-400 transition-colors">
+                      {thread.title}
+                    </p>
+                    <p class="text-gray-400 text-xs mt-1">
+                      {thread.author.username} • {thread.forum.name}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 text-gray-500 text-xs mt-3 pt-3 border-t border-neutral-700">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    {thread._count.comments}
+                  </span>
+                  <span class="text-gray-600">
+                    {formatDate(thread.updatedAt)}
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Forums Section -->
+      <div class="mb-8">
+        <h3 
+          class="text-white mb-6" 
+          style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 48px; line-height: 1.2; letter-spacing: -0.02em;"
+        >
+          Forum Topics
+        </h3>
+      </div>
+
       {forums.length === 0 ? (
         <div class="bg-neutral-800 rounded-lg border border-neutral-700 p-12 text-center">
           <p class="text-gray-400 text-lg">No forums available yet. Check back soon!</p>
         </div>
       ) : (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {forums.map((forum: any) => (
             <a 
               href={`/forums/${forum.slug}`}
-              class="bg-neutral-800 rounded-lg border border-neutral-700 p-6 lg:p-8 hover:border-neutral-600 hover:bg-neutral-750 transition-all flex flex-col group"
+              class="bg-neutral-800 rounded-lg border border-neutral-700 p-5 hover:border-neutral-600 hover:bg-neutral-750 transition-all duration-300 group"
             >
-              <h3 class="text-white font-semibold text-xl lg:text-2xl mb-3 group-hover:text-blue-400 transition-colors">
-                {forum.name}
-              </h3>
-              {forum.description && (
-                <p class="text-gray-400 text-sm lg:text-base mb-4 flex-1">
-                  {forum.description}
-                </p>
-              )}
-              <div class="flex items-center justify-between text-gray-500 text-xs lg:text-sm pt-4 border-t border-neutral-700">
-                <span class="flex items-center gap-2">
+              <div class="flex items-center justify-between">
+                <h3 
+                  class="text-white font-semibold text-lg group-hover:text-blue-400 transition-colors flex-1"
+                  style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; letter-spacing: -0.02em;"
+                >
+                  {forum.name}
+                </h3>
+                <span class="flex items-center gap-1.5 text-gray-400 text-xs ml-3">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  {forum.threads.length} {forum.threads.length === 1 ? 'thread' : 'threads'}
-                </span>
-                <span class="text-gray-600">
-                  {formatDate(forum.createdAt)}
+                  {forum.threads.length}
                 </span>
               </div>
             </a>

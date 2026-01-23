@@ -12,7 +12,7 @@ const threadIdStr = threadId?.toString() || '';
 const parentIdStr = parentId?.toString() || '';
 ---
 
-<div class="comment-editor bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-4 lg:p-6" data-editor-id={editorId} data-thread-id={threadIdStr} data-parent-id={parentIdStr} data-placeholder={placeholder}>
+<div class="comment-editor bg-neutral-800 rounded-lg border border-neutral-700 p-4 lg:p-6" data-editor-id={editorId} data-thread-id={threadIdStr} data-parent-id={parentIdStr} data-placeholder={placeholder}>
   <div class="flex gap-4">
     <!-- User Avatar -->
     <div class="flex-shrink-0">
@@ -24,7 +24,7 @@ const parentIdStr = parentId?.toString() || '';
     <!-- Editor Container -->
     <div class="flex-1">
       <!-- Toolbar -->
-      <div class="editor-toolbar flex flex-wrap items-center gap-1 mb-3 p-2 bg-gray-100 dark:bg-neutral-900 rounded-t border border-neutral-200 dark:border-neutral-700">
+      <div class="editor-toolbar flex flex-wrap items-center gap-1 mb-3 p-2 bg-neutral-900 rounded-t border border-neutral-700">
         <!-- Text Formatting -->
         <button type="button" class="toolbar-btn" data-command="bold" title="Bold (Ctrl+B)">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -47,7 +47,7 @@ const parentIdStr = parentId?.toString() || '';
           </svg>
         </button>
         
-        <div class="w-px h-6 bg-neutral-300 dark:bg-neutral-700 mx-1"></div>
+        <div class="w-px h-6 bg-neutral-700 mx-1"></div>
         
         <!-- Text Color -->
         <div class="relative color-picker-container">
@@ -57,7 +57,7 @@ const parentIdStr = parentId?.toString() || '';
             </svg>
             <div class="color-indicator w-4 h-1 bg-current mt-0.5 rounded"></div>
           </button>
-          <div class="color-dropdown hidden absolute top-full left-0 mt-1 p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded shadow-lg z-10 grid grid-cols-5 gap-1">
+          <div class="color-dropdown hidden absolute top-full left-0 mt-1 p-2 bg-neutral-800 border border-neutral-700 rounded shadow-lg z-10 grid grid-cols-5 gap-1">
             <button type="button" class="color-option w-6 h-6 rounded" style="background-color: #000000" data-color="#000000"></button>
             <button type="button" class="color-option w-6 h-6 rounded" style="background-color: #ef4444" data-color="#ef4444"></button>
             <button type="button" class="color-option w-6 h-6 rounded" style="background-color: #f97316" data-color="#f97316"></button>
@@ -67,11 +67,11 @@ const parentIdStr = parentId?.toString() || '';
             <button type="button" class="color-option w-6 h-6 rounded" style="background-color: #8b5cf6" data-color="#8b5cf6"></button>
             <button type="button" class="color-option w-6 h-6 rounded" style="background-color: #ec4899" data-color="#ec4899"></button>
             <button type="button" class="color-option w-6 h-6 rounded" style="background-color: #6b7280" data-color="#6b7280"></button>
-            <button type="button" class="color-option w-6 h-6 rounded border border-neutral-300 dark:border-neutral-600" style="background-color: #ffffff" data-color="#ffffff"></button>
+            <button type="button" class="color-option w-6 h-6 rounded border border-neutral-600" style="background-color: #ffffff" data-color="#ffffff"></button>
           </div>
         </div>
         
-        <div class="w-px h-6 bg-neutral-300 dark:bg-neutral-700 mx-1"></div>
+        <div class="w-px h-6 bg-neutral-700 mx-1"></div>
         
         <!-- Lists -->
         <button type="button" class="toolbar-btn" data-command="bulletList" title="Bullet List">
@@ -90,7 +90,31 @@ const parentIdStr = parentId?.toString() || '';
           </svg>
         </button>
         
-        <div class="w-px h-6 bg-neutral-300 dark:bg-neutral-700 mx-1"></div>
+        <div class="w-px h-6 bg-neutral-700 mx-1"></div>
+        
+        <!-- Code Block -->
+        <div class="relative code-block-container">
+          <button type="button" class="toolbar-btn code-block-btn" data-command="codeBlock" title="Code Block">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16,18 22,12 16,6"></polyline>
+              <polyline points="8,6 2,12 8,18"></polyline>
+            </svg>
+          </button>
+          <div class="language-dropdown hidden absolute top-full left-0 mt-1 py-1 bg-neutral-800 border border-neutral-700 rounded shadow-lg z-10 min-w-[140px]">
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="javascript">JavaScript</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="typescript">TypeScript</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="html">HTML</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="css">CSS</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="python">Python</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="json">JSON</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="bash">Bash</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="php">PHP</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="sql">SQL</button>
+            <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="plaintext">Plain Text</button>
+          </div>
+        </div>
+        
+        <div class="w-px h-6 bg-neutral-700 mx-1"></div>
         
         <!-- Links & Images -->
         <button type="button" class="toolbar-btn" data-command="link" title="Insert Link">
@@ -104,7 +128,7 @@ const parentIdStr = parentId?.toString() || '';
           </svg>
         </button>
         
-        <div class="w-px h-6 bg-neutral-300 dark:bg-neutral-700 mx-1"></div>
+        <div class="w-px h-6 bg-neutral-700 mx-1"></div>
         
         <!-- Undo/Redo -->
         <button type="button" class="toolbar-btn" data-command="undo" title="Undo (Ctrl+Z)">
@@ -132,7 +156,7 @@ const parentIdStr = parentId?.toString() || '';
 
       <!-- Editor Content -->
       <div class="editor-content-wrapper">
-        <div id={editorId} class="editor-content min-h-[150px] p-4 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white rounded-b border border-t-0 border-neutral-200 dark:border-neutral-700 focus-within:border-blue-500 dark:focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/20 dark:focus-within:ring-blue-400/20"></div>
+        <div id={editorId} class="editor-content min-h-[150px] p-4 bg-neutral-900 text-white rounded-b border border-t-0 border-neutral-700 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400/20"></div>
         
         <!-- Posting Guidelines -->
         <div class="mt-3 text-xs text-gray-500 dark:text-gray-400 space-y-1">
@@ -144,7 +168,7 @@ const parentIdStr = parentId?.toString() || '';
 
       <!-- Action Buttons -->
       <div class="flex items-center justify-between gap-3 mt-4">
-        <button type="button" class="files-btn px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-neutral-900 dark:hover:text-white border border-neutral-300 dark:border-neutral-700 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors flex items-center gap-2">
+        <button type="button" class="files-btn px-4 py-2 text-sm text-gray-400 hover:text-white border border-neutral-700 rounded hover:bg-neutral-700 transition-colors flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
           </svg>
@@ -170,6 +194,11 @@ const parentIdStr = parentId?.toString() || '';
   import Underline from '@tiptap/extension-underline';
   import { TextStyle } from '@tiptap/extension-text-style';
   import Color from '@tiptap/extension-color';
+  import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+  import { common, createLowlight } from 'lowlight';
+
+  // Create lowlight instance with common languages
+  const lowlight = createLowlight(common);
 
   document.addEventListener('DOMContentLoaded', () => {
     const editors = document.querySelectorAll('.comment-editor');
@@ -187,14 +216,22 @@ const parentIdStr = parentId?.toString() || '';
       const editor = new Editor({
         element: editorElement,
         extensions: [
-          StarterKit,
+          StarterKit.configure({
+            codeBlock: false, // Disable default code block, use CodeBlockLowlight instead
+          }),
           Underline,
           TextStyle,
           Color,
+          CodeBlockLowlight.configure({
+            lowlight,
+            HTMLAttributes: {
+              class: 'code-block',
+            },
+          }),
           Link.configure({
             openOnClick: false,
             HTMLAttributes: {
-              class: 'text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300',
+              class: 'text-blue-400 underline hover:text-blue-300',
             },
           }),
           Image.configure({
@@ -208,7 +245,7 @@ const parentIdStr = parentId?.toString() || '';
         ],
         editorProps: {
           attributes: {
-            class: 'prose prose-neutral dark:prose-invert max-w-none focus:outline-none min-h-[120px]',
+            class: 'prose prose-invert max-w-none focus:outline-none min-h-[120px]',
           },
         },
       });
@@ -242,6 +279,9 @@ const parentIdStr = parentId?.toString() || '';
               break;
             case 'blockquote':
               isActive = editor.isActive('blockquote');
+              break;
+            case 'codeBlock':
+              isActive = editor.isActive('codeBlock');
               break;
           }
           
@@ -287,8 +327,37 @@ const parentIdStr = parentId?.toString() || '';
         });
       }
 
+      // Code block dropdown functionality
+      const codeBlockBtn = editorContainer.querySelector('.code-block-btn');
+      const languageDropdown = editorContainer.querySelector('.language-dropdown');
+      const languageOptions = editorContainer.querySelectorAll('.language-option');
+
+      if (codeBlockBtn && languageDropdown) {
+        codeBlockBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          languageDropdown.classList.toggle('hidden');
+        });
+
+        languageOptions.forEach((option) => {
+          option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const language = option.getAttribute('data-language') || 'plaintext';
+            editor.chain().focus().toggleCodeBlock({ language }).run();
+            languageDropdown.classList.add('hidden');
+          });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!codeBlockBtn.contains(e.target as Node) && !languageDropdown.contains(e.target as Node)) {
+            languageDropdown.classList.add('hidden');
+          }
+        });
+      }
+
       // Toolbar button handlers
-      const toolbarButtons = editorContainer.querySelectorAll('.toolbar-btn:not(.color-btn):not(.search-toggle-btn)');
+      const toolbarButtons = editorContainer.querySelectorAll('.toolbar-btn:not(.color-btn):not(.search-toggle-btn):not(.code-block-btn)');
       toolbarButtons.forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
@@ -405,11 +474,11 @@ const parentIdStr = parentId?.toString() || '';
   @reference "../styles/global.css";
   
   .toolbar-btn {
-    @apply px-2 py-1.5 text-gray-600 dark:text-gray-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded transition-colors;
+    @apply px-2 py-1.5 text-gray-400 hover:text-white hover:bg-neutral-700 rounded transition-colors;
   }
 
   .toolbar-btn.active {
-    @apply text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30;
+    @apply text-blue-400 bg-blue-900/30;
   }
 
   .editor-content :global(.ProseMirror) {
@@ -421,7 +490,7 @@ const parentIdStr = parentId?.toString() || '';
   }
 
   .editor-content :global(p.is-editor-empty:first-child::before) {
-    @apply text-gray-400 dark:text-gray-500;
+    @apply text-gray-500;
     content: attr(data-placeholder);
     float: left;
     height: 0;
@@ -442,11 +511,11 @@ const parentIdStr = parentId?.toString() || '';
   }
 
   .editor-content :global(blockquote) {
-    @apply border-l-4 border-blue-500 dark:border-blue-400 pl-4 italic text-gray-700 dark:text-gray-300 my-2 bg-blue-50 dark:bg-blue-900/20 py-2 rounded-r;
+    @apply border-l-4 border-blue-400 pl-4 italic text-gray-300 my-2 bg-blue-900/20 py-2 rounded-r;
   }
 
   .editor-content :global(a) {
-    @apply text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300;
+    @apply text-blue-400 underline hover:text-blue-300;
   }
 
   .editor-content :global(img) {
@@ -459,5 +528,83 @@ const parentIdStr = parentId?.toString() || '';
 
   .editor-content :global(s) {
     @apply line-through;
+  }
+
+  /* Code block styles */
+  .editor-content :global(pre) {
+    @apply bg-neutral-900 border border-neutral-700 rounded-lg my-2 overflow-x-auto;
+  }
+
+  .editor-content :global(pre code) {
+    @apply block p-4 text-sm font-mono text-gray-200;
+  }
+
+  .editor-content :global(code) {
+    @apply bg-neutral-700 px-1.5 py-0.5 rounded text-amber-400 text-sm font-mono;
+  }
+
+  .editor-content :global(pre code) {
+    @apply bg-transparent p-4;
+  }
+
+  /* Syntax highlighting - Lowlight/Highlight.js classes */
+  .editor-content :global(.hljs-keyword),
+  .editor-content :global(.hljs-selector-tag),
+  .editor-content :global(.hljs-built_in),
+  .editor-content :global(.hljs-name) {
+    @apply text-purple-400;
+  }
+
+  .editor-content :global(.hljs-string),
+  .editor-content :global(.hljs-attr),
+  .editor-content :global(.hljs-symbol),
+  .editor-content :global(.hljs-bullet) {
+    @apply text-green-400;
+  }
+
+  .editor-content :global(.hljs-number),
+  .editor-content :global(.hljs-literal) {
+    @apply text-orange-400;
+  }
+
+  .editor-content :global(.hljs-title),
+  .editor-content :global(.hljs-section),
+  .editor-content :global(.hljs-selector-class) {
+    @apply text-yellow-400;
+  }
+
+  .editor-content :global(.hljs-function),
+  .editor-content :global(.hljs-title.function_) {
+    @apply text-blue-400;
+  }
+
+  .editor-content :global(.hljs-comment),
+  .editor-content :global(.hljs-quote) {
+    @apply text-gray-500 italic;
+  }
+
+  .editor-content :global(.hljs-meta),
+  .editor-content :global(.hljs-tag) {
+    @apply text-cyan-400;
+  }
+
+  .editor-content :global(.hljs-attribute),
+  .editor-content :global(.hljs-selector-attr) {
+    @apply text-cyan-300;
+  }
+
+  .editor-content :global(.hljs-variable),
+  .editor-content :global(.hljs-template-variable),
+  .editor-content :global(.hljs-params) {
+    @apply text-red-400;
+  }
+
+  .editor-content :global(.hljs-regexp) {
+    @apply text-red-300;
+  }
+
+  .editor-content :global(.hljs-type),
+  .editor-content :global(.hljs-class .hljs-title) {
+    @apply text-teal-400;
   }
 </style>

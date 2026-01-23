@@ -97,6 +97,30 @@ const editorId = `thread-editor-${Math.random().toString(36).substr(2, 9)}`;
       
       <div class="w-px h-6 bg-neutral-700 mx-1"></div>
       
+      <!-- Code Block -->
+      <div class="relative code-block-container">
+        <button type="button" class="toolbar-btn code-block-btn" data-command="codeBlock" title="Code Block">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16,18 22,12 16,6"></polyline>
+            <polyline points="8,6 2,12 8,18"></polyline>
+          </svg>
+        </button>
+        <div class="language-dropdown hidden absolute top-full left-0 mt-1 py-1 bg-neutral-800 border border-neutral-700 rounded shadow-lg z-10 min-w-[140px]">
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="javascript">JavaScript</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="typescript">TypeScript</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="html">HTML</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="css">CSS</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="python">Python</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="json">JSON</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="bash">Bash</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="php">PHP</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="sql">SQL</button>
+          <button type="button" class="language-option w-full px-3 py-1.5 text-left text-sm text-gray-300 hover:bg-neutral-700" data-language="plaintext">Plain Text</button>
+        </div>
+      </div>
+      
+      <div class="w-px h-6 bg-neutral-700 mx-1"></div>
+      
       <!-- Links & Images -->
       <button type="button" class="toolbar-btn" data-command="link" title="Insert Link">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,6 +188,11 @@ const editorId = `thread-editor-${Math.random().toString(36).substr(2, 9)}`;
   import Underline from '@tiptap/extension-underline';
   import { TextStyle } from '@tiptap/extension-text-style';
   import Color from '@tiptap/extension-color';
+  import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+  import { common, createLowlight } from 'lowlight';
+
+  // Create lowlight instance with common languages
+  const lowlight = createLowlight(common);
 
   document.addEventListener('DOMContentLoaded', () => {
     const threadEditors = document.querySelectorAll('.thread-editor');
@@ -179,10 +208,18 @@ const editorId = `thread-editor-${Math.random().toString(36).substr(2, 9)}`;
       const editor = new Editor({
         element: editorElement,
         extensions: [
-          StarterKit,
+          StarterKit.configure({
+            codeBlock: false, // Disable default code block, use CodeBlockLowlight instead
+          }),
           Underline,
           TextStyle,
           Color,
+          CodeBlockLowlight.configure({
+            lowlight,
+            HTMLAttributes: {
+              class: 'code-block',
+            },
+          }),
           Link.configure({
             openOnClick: false,
             HTMLAttributes: {
@@ -235,6 +272,9 @@ const editorId = `thread-editor-${Math.random().toString(36).substr(2, 9)}`;
             case 'blockquote':
               isActive = editor.isActive('blockquote');
               break;
+            case 'codeBlock':
+              isActive = editor.isActive('codeBlock');
+              break;
           }
           
           btn.classList.toggle('active', isActive);
@@ -279,8 +319,37 @@ const editorId = `thread-editor-${Math.random().toString(36).substr(2, 9)}`;
         });
       }
 
+      // Code block dropdown functionality
+      const codeBlockBtn = editorContainer.querySelector('.code-block-btn');
+      const languageDropdown = editorContainer.querySelector('.language-dropdown');
+      const languageOptions = editorContainer.querySelectorAll('.language-option');
+
+      if (codeBlockBtn && languageDropdown) {
+        codeBlockBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          languageDropdown.classList.toggle('hidden');
+        });
+
+        languageOptions.forEach((option) => {
+          option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const language = option.getAttribute('data-language') || 'plaintext';
+            editor.chain().focus().toggleCodeBlock({ language }).run();
+            languageDropdown.classList.add('hidden');
+          });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!codeBlockBtn.contains(e.target as Node) && !languageDropdown.contains(e.target as Node)) {
+            languageDropdown.classList.add('hidden');
+          }
+        });
+      }
+
       // Toolbar button handlers
-      const toolbarButtons = editorContainer.querySelectorAll('.toolbar-btn:not(.color-btn)');
+      const toolbarButtons = editorContainer.querySelectorAll('.toolbar-btn:not(.color-btn):not(.code-block-btn)');
       toolbarButtons.forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
@@ -446,5 +515,83 @@ const editorId = `thread-editor-${Math.random().toString(36).substr(2, 9)}`;
 
   .editor-content :global(s) {
     @apply line-through;
+  }
+
+  /* Code block styles */
+  .editor-content :global(pre) {
+    @apply bg-neutral-900 border border-neutral-700 rounded-lg my-3 overflow-x-auto;
+  }
+
+  .editor-content :global(pre code) {
+    @apply block p-4 text-sm font-mono text-gray-200;
+  }
+
+  .editor-content :global(code) {
+    @apply bg-neutral-700 px-1.5 py-0.5 rounded text-amber-400 text-sm font-mono;
+  }
+
+  .editor-content :global(pre code) {
+    @apply bg-transparent p-4;
+  }
+
+  /* Syntax highlighting - Lowlight/Highlight.js classes */
+  .editor-content :global(.hljs-keyword),
+  .editor-content :global(.hljs-selector-tag),
+  .editor-content :global(.hljs-built_in),
+  .editor-content :global(.hljs-name) {
+    @apply text-purple-400;
+  }
+
+  .editor-content :global(.hljs-string),
+  .editor-content :global(.hljs-attr),
+  .editor-content :global(.hljs-symbol),
+  .editor-content :global(.hljs-bullet) {
+    @apply text-green-400;
+  }
+
+  .editor-content :global(.hljs-number),
+  .editor-content :global(.hljs-literal) {
+    @apply text-orange-400;
+  }
+
+  .editor-content :global(.hljs-title),
+  .editor-content :global(.hljs-section),
+  .editor-content :global(.hljs-selector-class) {
+    @apply text-yellow-400;
+  }
+
+  .editor-content :global(.hljs-function),
+  .editor-content :global(.hljs-title.function_) {
+    @apply text-blue-400;
+  }
+
+  .editor-content :global(.hljs-comment),
+  .editor-content :global(.hljs-quote) {
+    @apply text-gray-500 italic;
+  }
+
+  .editor-content :global(.hljs-meta),
+  .editor-content :global(.hljs-tag) {
+    @apply text-cyan-400;
+  }
+
+  .editor-content :global(.hljs-attribute),
+  .editor-content :global(.hljs-selector-attr) {
+    @apply text-cyan-300;
+  }
+
+  .editor-content :global(.hljs-variable),
+  .editor-content :global(.hljs-template-variable),
+  .editor-content :global(.hljs-params) {
+    @apply text-red-400;
+  }
+
+  .editor-content :global(.hljs-regexp) {
+    @apply text-red-300;
+  }
+
+  .editor-content :global(.hljs-type),
+  .editor-content :global(.hljs-class .hljs-title) {
+    @apply text-teal-400;
   }
 </style>

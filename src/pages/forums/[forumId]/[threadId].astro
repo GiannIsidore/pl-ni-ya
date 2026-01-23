@@ -57,8 +57,8 @@ const shareUrl = Astro.url.origin + Astro.url.pathname;
 ---
 
 <Layout title={`PL-${thread.title}`}>
-  <div class="min-h-screen bg-gray-100 dark:bg-neutral-900">
-    <div class="max-w-4xl mx-auto px-6 lg:px-12 py-8 lg:py-12">
+  <section class="text-white px-6 lg:px-12 pb-16 lg:pb-24 pt-16 lg:pt-24 bg-neutral-900 min-h-screen">
+    <div class="max-w-4xl mx-auto">
       <!-- Breadcrumbs -->
       <Breadcrumbs 
         items={[
@@ -71,7 +71,7 @@ const shareUrl = Astro.url.origin + Astro.url.pathname;
 
       <!-- Thread Title -->
       <h1 
-        class="text-neutral-900 dark:text-white mb-6" 
+        class="text-white mb-6" 
         style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: clamp(36px, 6vw, 56px); line-height: 1.1; letter-spacing: -0.02em;"
       >
         {thread.title}
@@ -100,8 +100,8 @@ const shareUrl = Astro.url.origin + Astro.url.pathname;
       <!-- Comments List -->
       <div class="mt-8">
         {paginatedComments.length === 0 ? (
-          <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-12 text-center">
-            <p class="text-gray-600 dark:text-gray-400 text-lg">No comments yet. Be the first to comment!</p>
+          <div class="bg-neutral-800 rounded-lg border border-neutral-700 p-12 text-center">
+            <p class="text-gray-400 text-lg">No comments yet. Be the first to comment!</p>
           </div>
         ) : (
           <>
@@ -117,5 +117,5 @@ const shareUrl = Astro.url.origin + Astro.url.pathname;
         )}
       </div>
     </div>
-  </div>
+  </section>
 </Layout>

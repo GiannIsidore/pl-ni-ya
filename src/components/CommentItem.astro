@@ -72,8 +72,8 @@ if (likeCount === 1) {
 }
 ---
 
-<div class={`comment-item ${depth > 0 ? 'ml-8 lg:ml-12 border-l-2 border-neutral-300 dark:border-neutral-700 pl-4 lg:pl-6' : ''}`} data-comment-id={comment.id}>
-  <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-4 lg:p-6 mb-4">
+<div class={`comment-item ${depth > 0 ? 'ml-8 lg:ml-12 border-l-2 border-neutral-700 pl-4 lg:pl-6' : ''}`} data-comment-id={comment.id}>
+  <div class="bg-neutral-800 rounded-lg border border-neutral-700 p-4 lg:p-6 mb-4">
     <div class="flex gap-4">
       <!-- Avatar -->
       <div class="flex-shrink-0">
@@ -96,20 +96,20 @@ if (likeCount === 1) {
       <div class="flex-1 min-w-0">
         <!-- Author & Date -->
         <div class="flex items-center gap-3 mb-2">
-          <span class="text-neutral-900 dark:text-white font-semibold text-sm lg:text-base">
+          <span class="text-white font-semibold text-sm lg:text-base">
             {comment.author.username}
           </span>
-          <span class="px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+          <span class="px-2 py-0.5 text-xs bg-blue-900 text-blue-200 rounded">
             Contributor
           </span>
-          <span class="text-gray-500 dark:text-gray-400 text-xs lg:text-sm">
+          <span class="text-gray-400 text-xs lg:text-sm">
             {formatDate(comment.createdAt)}
           </span>
         </div>
 
         <!-- Comment Content -->
         <div 
-          class="comment-content text-neutral-800 dark:text-gray-300 text-sm lg:text-base leading-relaxed mb-3 prose prose-invert max-w-none"
+          class="comment-content text-gray-300 text-sm lg:text-base leading-relaxed mb-3 prose prose-invert max-w-none"
           set:html={comment.content}
         />
 
@@ -117,7 +117,7 @@ if (likeCount === 1) {
         <div class="flex items-center gap-4 mb-2">
           <button 
             type="button"
-            class="like-btn flex items-center gap-1 text-xs lg:text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            class="like-btn flex items-center gap-1 text-xs lg:text-sm text-gray-400 hover:text-blue-400 transition-colors"
             data-comment-id={comment.id}
             data-liked="false"
           >
@@ -129,15 +129,7 @@ if (likeCount === 1) {
           
           <button 
             type="button"
-            class="quote-btn text-xs lg:text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            data-comment-id={comment.id}
-          >
-            +Q
-          </button>
-          
-          <button 
-            type="button"
-            class="reply-btn text-xs lg:text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+            class="reply-btn text-xs lg:text-sm text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-1"
             data-comment-id={comment.id}
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +140,7 @@ if (likeCount === 1) {
         </div>
 
         <!-- Who Liked -->
-        <div class="liked-by-container text-xs text-gray-500 dark:text-gray-400 mb-3" style={likeCount === 0 ? 'display: none;' : ''}>
+        <div class="liked-by-container text-xs text-gray-400 mb-3" style={likeCount === 0 ? 'display: none;' : ''}>
           <span class="liked-by-text">{likedByText}</span>
           {otherLikes > 0 && (
             <span class="others-text"> and {otherLikes} other{otherLikes > 1 ? 's' : ''}</span>
@@ -180,7 +172,6 @@ if (likeCount === 1) {
     
     commentItems.forEach((item) => {
       const replyBtn = item.querySelector(':scope > div > div > div > .reply-btn') as HTMLButtonElement;
-      const quoteBtn = item.querySelector(':scope > div > div > div > .quote-btn') as HTMLButtonElement;
       const likeBtn = item.querySelector(':scope > div > div > div > .like-btn') as HTMLButtonElement;
       
       // Reply button handler
@@ -205,15 +196,6 @@ if (likeCount === 1) {
               replyContainer.classList.add('hidden');
             }
           }
-        });
-      }
-
-      // Quote button handler
-      if (quoteBtn) {
-        quoteBtn.addEventListener('click', () => {
-          const commentId = quoteBtn.getAttribute('data-comment-id');
-          // TODO: Implement quote functionality
-          console.log('Quote comment:', commentId);
         });
       }
 
@@ -254,15 +236,15 @@ if (likeCount === 1) {
             
             // Toggle active state
             if (result.action === 'liked') {
-              likeBtn.classList.add('text-blue-600', 'dark:text-blue-400');
-              likeBtn.classList.remove('text-gray-600', 'dark:text-gray-400');
+              likeBtn.classList.add('text-blue-400');
+              likeBtn.classList.remove('text-gray-400');
               likeBtn.setAttribute('data-liked', 'true');
               if (likeIcon) {
                 likeIcon.setAttribute('fill', 'currentColor');
               }
             } else {
-              likeBtn.classList.remove('text-blue-600', 'dark:text-blue-400');
-              likeBtn.classList.add('text-gray-600', 'dark:text-gray-400');
+              likeBtn.classList.remove('text-blue-400');
+              likeBtn.classList.add('text-gray-400');
               likeBtn.setAttribute('data-liked', 'false');
               if (likeIcon) {
                 likeIcon.setAttribute('fill', 'none');
@@ -298,11 +280,11 @@ if (likeCount === 1) {
   }
 
   .comment-content :global(blockquote) {
-    @apply border-l-4 border-blue-500 dark:border-blue-400 pl-4 italic text-gray-700 dark:text-gray-300 my-2 bg-blue-50 dark:bg-blue-900/20 py-2 rounded-r;
+    @apply border-l-4 border-blue-400 pl-4 italic text-gray-300 my-2 bg-blue-900/20 py-2 rounded-r;
   }
 
   .comment-content :global(a) {
-    @apply text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300;
+    @apply text-blue-400 underline hover:text-blue-300;
   }
 
   .comment-content :global(img) {
@@ -310,15 +292,76 @@ if (likeCount === 1) {
   }
 
   .comment-content :global(code) {
-    @apply bg-neutral-100 dark:bg-neutral-700 px-1.5 py-0.5 rounded text-amber-600 dark:text-amber-400 text-sm;
+    @apply bg-neutral-700 px-1.5 py-0.5 rounded text-amber-400 text-sm;
   }
 
   .comment-content :global(pre) {
-    @apply bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-4 rounded my-2 overflow-x-auto;
+    @apply bg-neutral-900 border border-neutral-700 p-4 rounded my-2 overflow-x-auto;
   }
 
   .comment-content :global(pre code) {
-    @apply bg-transparent p-0 text-gray-800 dark:text-gray-200;
+    @apply bg-transparent p-0 text-gray-200;
+  }
+
+  /* Syntax highlighting - Lowlight/Highlight.js classes */
+  .comment-content :global(.hljs-keyword),
+  .comment-content :global(.hljs-selector-tag),
+  .comment-content :global(.hljs-built_in),
+  .comment-content :global(.hljs-name) {
+    @apply text-purple-400;
+  }
+
+  .comment-content :global(.hljs-string),
+  .comment-content :global(.hljs-attr),
+  .comment-content :global(.hljs-symbol),
+  .comment-content :global(.hljs-bullet) {
+    @apply text-green-400;
+  }
+
+  .comment-content :global(.hljs-number),
+  .comment-content :global(.hljs-literal) {
+    @apply text-orange-400;
+  }
+
+  .comment-content :global(.hljs-title),
+  .comment-content :global(.hljs-section),
+  .comment-content :global(.hljs-selector-class) {
+    @apply text-yellow-400;
+  }
+
+  .comment-content :global(.hljs-function),
+  .comment-content :global(.hljs-title.function_) {
+    @apply text-blue-400;
+  }
+
+  .comment-content :global(.hljs-comment),
+  .comment-content :global(.hljs-quote) {
+    @apply text-gray-500 italic;
+  }
+
+  .comment-content :global(.hljs-meta),
+  .comment-content :global(.hljs-tag) {
+    @apply text-cyan-400;
+  }
+
+  .comment-content :global(.hljs-attribute),
+  .comment-content :global(.hljs-selector-attr) {
+    @apply text-cyan-300;
+  }
+
+  .comment-content :global(.hljs-variable),
+  .comment-content :global(.hljs-template-variable),
+  .comment-content :global(.hljs-params) {
+    @apply text-red-400;
+  }
+
+  .comment-content :global(.hljs-regexp) {
+    @apply text-red-300;
+  }
+
+  .comment-content :global(.hljs-type),
+  .comment-content :global(.hljs-class .hljs-title) {
+    @apply text-teal-400;
   }
   
   .like-btn[data-liked="true"] .like-icon {

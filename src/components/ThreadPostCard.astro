@@ -69,7 +69,7 @@ if (likeCount === 1) {
 }
 ---
 
-<div class="thread-post-card bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-6 mb-6" data-thread-id={threadId}>
+<div class="thread-post-card bg-neutral-800 rounded-lg border border-neutral-700 p-6 mb-6" data-thread-id={threadId}>
   <div class="flex gap-4">
     <!-- Avatar -->
     <div class="flex-shrink-0">
@@ -92,20 +92,20 @@ if (likeCount === 1) {
     <div class="flex-1 min-w-0">
       <!-- Author & Date -->
       <div class="flex items-center gap-3 mb-3">
-        <span class="text-neutral-900 dark:text-white font-semibold text-base">
+        <span class="text-white font-semibold text-base">
           {thread.author.username}
         </span>
-        <span class="px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+        <span class="px-2 py-0.5 text-xs bg-blue-900 text-blue-200 rounded">
           Contributor
         </span>
-        <span class="text-gray-500 dark:text-gray-400 text-sm">
+        <span class="text-gray-400 text-sm">
           {formatDate(thread.createdAt)}
         </span>
       </div>
 
       <!-- Thread Content -->
       <div 
-        class="thread-post-content text-neutral-800 dark:text-gray-300 text-base leading-relaxed mb-4 prose prose-invert max-w-none"
+        class="thread-post-content text-gray-300 text-base leading-relaxed mb-4 prose prose-invert max-w-none"
         set:html={thread.content}
       />
 
@@ -113,7 +113,7 @@ if (likeCount === 1) {
       <div class="flex items-center gap-4 mb-3">
         <button 
           type="button"
-          class="like-btn flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          class="like-btn flex items-center gap-2 text-sm text-gray-400 hover:text-blue-400 transition-colors"
           data-thread-id={threadId}
           data-liked="false"
         >
@@ -125,15 +125,7 @@ if (likeCount === 1) {
         
         <button 
           type="button"
-          class="quote-btn flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-          data-thread-id={threadId}
-        >
-          <span>+Q</span>
-        </button>
-        
-        <button 
-          type="button"
-          class="reply-btn flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          class="reply-btn flex items-center gap-2 text-sm text-gray-400 hover:text-blue-400 transition-colors"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
@@ -143,7 +135,7 @@ if (likeCount === 1) {
       </div>
 
       <!-- Who Liked -->
-      <div class="liked-by-container text-xs text-gray-500 dark:text-gray-400 mb-2" style={likeCount === 0 ? 'display: none;' : ''}>
+      <div class="liked-by-container text-xs text-gray-400 mb-2" style={likeCount === 0 ? 'display: none;' : ''}>
         <span class="liked-by-text">{likedByText}</span>
         {otherLikes > 0 && (
           <span class="others-text"> and {otherLikes} other{otherLikes > 1 ? 's' : ''}</span>
@@ -197,15 +189,15 @@ if (likeCount === 1) {
           
           // Toggle active state
           if (result.action === 'liked') {
-            likeBtn.classList.add('text-blue-600', 'dark:text-blue-400');
-            likeBtn.classList.remove('text-gray-600', 'dark:text-gray-400');
+            likeBtn.classList.add('text-blue-400');
+            likeBtn.classList.remove('text-gray-400');
             likeBtn.setAttribute('data-liked', 'true');
             if (likeIcon) {
               likeIcon.setAttribute('fill', 'currentColor');
             }
           } else {
-            likeBtn.classList.remove('text-blue-600', 'dark:text-blue-400');
-            likeBtn.classList.add('text-gray-600', 'dark:text-gray-400');
+            likeBtn.classList.remove('text-blue-400');
+            likeBtn.classList.add('text-gray-400');
             likeBtn.setAttribute('data-liked', 'false');
             if (likeIcon) {
               likeIcon.setAttribute('fill', 'none');
@@ -240,11 +232,11 @@ if (likeCount === 1) {
   }
 
   .thread-post-content :global(blockquote) {
-    @apply border-l-4 border-blue-500 dark:border-blue-400 pl-4 italic text-gray-700 dark:text-gray-300 my-3 bg-blue-50 dark:bg-blue-900/20 py-2 rounded-r;
+    @apply border-l-4 border-blue-400 pl-4 italic text-gray-300 my-3 bg-blue-900/20 py-2 rounded-r;
   }
 
   .thread-post-content :global(a) {
-    @apply text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300;
+    @apply text-blue-400 underline hover:text-blue-300;
   }
 
   .thread-post-content :global(img) {
@@ -252,15 +244,76 @@ if (likeCount === 1) {
   }
 
   .thread-post-content :global(code) {
-    @apply bg-neutral-100 dark:bg-neutral-700 px-1.5 py-0.5 rounded text-amber-600 dark:text-amber-400 text-sm;
+    @apply bg-neutral-700 px-1.5 py-0.5 rounded text-amber-400 text-sm;
   }
 
   .thread-post-content :global(pre) {
-    @apply bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-4 rounded my-3 overflow-x-auto;
+    @apply bg-neutral-900 border border-neutral-700 p-4 rounded my-3 overflow-x-auto;
   }
 
   .thread-post-content :global(pre code) {
-    @apply bg-transparent p-0 text-gray-800 dark:text-gray-200;
+    @apply bg-transparent p-0 text-gray-200;
+  }
+
+  /* Syntax highlighting - Lowlight/Highlight.js classes */
+  .thread-post-content :global(.hljs-keyword),
+  .thread-post-content :global(.hljs-selector-tag),
+  .thread-post-content :global(.hljs-built_in),
+  .thread-post-content :global(.hljs-name) {
+    @apply text-purple-600 dark:text-purple-400;
+  }
+
+  .thread-post-content :global(.hljs-string),
+  .thread-post-content :global(.hljs-attr),
+  .thread-post-content :global(.hljs-symbol),
+  .thread-post-content :global(.hljs-bullet) {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .thread-post-content :global(.hljs-number),
+  .thread-post-content :global(.hljs-literal) {
+    @apply text-orange-600 dark:text-orange-400;
+  }
+
+  .thread-post-content :global(.hljs-title),
+  .thread-post-content :global(.hljs-section),
+  .thread-post-content :global(.hljs-selector-class) {
+    @apply text-yellow-600 dark:text-yellow-400;
+  }
+
+  .thread-post-content :global(.hljs-function),
+  .thread-post-content :global(.hljs-title.function_) {
+    @apply text-blue-600 dark:text-blue-400;
+  }
+
+  .thread-post-content :global(.hljs-comment),
+  .thread-post-content :global(.hljs-quote) {
+    @apply text-gray-500 italic;
+  }
+
+  .thread-post-content :global(.hljs-meta),
+  .thread-post-content :global(.hljs-tag) {
+    @apply text-cyan-600 dark:text-cyan-400;
+  }
+
+  .thread-post-content :global(.hljs-attribute),
+  .thread-post-content :global(.hljs-selector-attr) {
+    @apply text-cyan-500 dark:text-cyan-300;
+  }
+
+  .thread-post-content :global(.hljs-variable),
+  .thread-post-content :global(.hljs-template-variable),
+  .thread-post-content :global(.hljs-params) {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .thread-post-content :global(.hljs-regexp) {
+    @apply text-red-500 dark:text-red-300;
+  }
+
+  .thread-post-content :global(.hljs-type),
+  .thread-post-content :global(.hljs-class .hljs-title) {
+    @apply text-teal-600 dark:text-teal-400;
   }
   
   .like-btn[data-liked="true"] .like-icon {
