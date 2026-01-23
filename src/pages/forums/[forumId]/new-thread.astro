@@ -1,0 +1,56 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import prisma from "../../../lib/prisma";
+import ThreadEditor from "../../../components/ThreadEditor.astro";
+
+const { forumId } = Astro.params;
+const forum = await prisma.forum.findUnique({
+  where: {
+    slug: forumId,
+  },
+});
+
+if (!forum) {
+  return Astro.redirect("/forums");
+}
+---
+
+<Layout title={`PL-New Thread - ${forum.name}`}>
+  <div class="min-h-screen bg-neutral-900">
+    <div class="max-w-4xl mx-auto px-6 lg:px-12 py-12 lg:py-20">
+      <!-- Back Button -->
+      <div class="mb-8">
+        <a 
+          href={`/forums/${forumId}`} 
+          class="group inline-flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 text-sm font-medium"
+        >
+          <svg class="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span class="relative">
+            Back to {forum.name}
+            <span class="absolute bottom-0 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full"></span>
+          </span>
+        </a>
+      </div>
+
+      <!-- Form Header -->
+      <header class="mb-8 lg:mb-12">
+        <h1 
+          class="text-white mb-6" 
+          style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: clamp(48px, 8vw, 72px); line-height: 1.1; letter-spacing: -0.02em;"
+        >
+          Create New Thread
+        </h1>
+        <p class="text-gray-400 text-lg">
+          Start a new discussion in {forum.name}
+        </p>
+      </header>
+
+      <!-- Thread Editor with Rich Text -->
+      <div class="bg-neutral-800 rounded-lg border border-neutral-700 p-6 lg:p-8">
+        <ThreadEditor forumId={forum.id} forumSlug={forum.slug} />
+      </div>
+    </div>
+  </div>
+</Layout>

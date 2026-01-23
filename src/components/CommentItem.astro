@@ -1,0 +1,327 @@
+---
+import CommentEditor from './CommentEditor.astro';
+import prisma from '../lib/prisma';
+
+interface Comment {
+  id: number;
+  content: string;
+  createdAt: Date;
+  author: {
+    id: number;
+    username: string;
+    avatar?: string | null;
+  };
+  replies?: Comment[];
+}
+
+interface Props {
+  comment: Comment;
+  threadId: number;
+  depth?: number;
+}
+
+const { comment, threadId, depth = 0 } = Astro.props;
+
+function formatDate(date: Date): string {
+  const d = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  
+  return d.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
+}
+
+// Fetch real like data for this comment
+const likes = await prisma.like.findMany({
+  where: { commentId: comment.id },
+  include: {
+    user: {
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+      },
+    },
+  },
+  orderBy: { createdAt: 'desc' },
+});
+
+const likeCount = likes.length;
+const likedByUsers = likes.slice(0, 3).map(like => like.user.username);
+const otherLikes = likeCount > 3 ? likeCount - 3 : 0;
+
+// Format "liked by" text
+let likedByText = '';
+if (likeCount === 1) {
+  likedByText = likedByUsers[0];
+} else if (likeCount === 2) {
+  likedByText = `${likedByUsers[0]} and ${likedByUsers[1]}`;
+} else if (likeCount >= 3) {
+  likedByText = likedByUsers.join(', ');
+}
+---
+
+<div class={`comment-item ${depth > 0 ? 'ml-8 lg:ml-12 border-l-2 border-neutral-300 dark:border-neutral-700 pl-4 lg:pl-6' : ''}`} data-comment-id={comment.id}>
+  <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-4 lg:p-6 mb-4">
+    <div class="flex gap-4">
+      <!-- Avatar -->
+      <div class="flex-shrink-0">
+        {comment.author.avatar ? (
+          <img 
+            src={comment.author.avatar} 
+            alt={comment.author.username}
+            class="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-cover"
+          />
+        ) : (
+          <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-neutral-700 flex items-center justify-center overflow-hidden">
+            <svg class="w-6 h-6 lg:w-8 lg:h-8 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        )}
+      </div>
+
+      <!-- Content -->
+      <div class="flex-1 min-w-0">
+        <!-- Author & Date -->
+        <div class="flex items-center gap-3 mb-2">
+          <span class="text-neutral-900 dark:text-white font-semibold text-sm lg:text-base">
+            {comment.author.username}
+          </span>
+          <span class="px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+            Contributor
+          </span>
+          <span class="text-gray-500 dark:text-gray-400 text-xs lg:text-sm">
+            {formatDate(comment.createdAt)}
+          </span>
+        </div>
+
+        <!-- Comment Content -->
+        <div 
+          class="comment-content text-neutral-800 dark:text-gray-300 text-sm lg:text-base leading-relaxed mb-3 prose prose-invert max-w-none"
+          set:html={comment.content}
+        />
+
+        <!-- Interaction Buttons -->
+        <div class="flex items-center gap-4 mb-2">
+          <button 
+            type="button"
+            class="like-btn flex items-center gap-1 text-xs lg:text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            data-comment-id={comment.id}
+            data-liked="false"
+          >
+            <svg class="like-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+            </svg>
+            <span class="like-count">{likeCount}</span>
+          </button>
+          
+          <button 
+            type="button"
+            class="quote-btn text-xs lg:text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            data-comment-id={comment.id}
+          >
+            +Q
+          </button>
+          
+          <button 
+            type="button"
+            class="reply-btn text-xs lg:text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+            data-comment-id={comment.id}
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+            </svg>
+            Reply
+          </button>
+        </div>
+
+        <!-- Who Liked -->
+        <div class="liked-by-container text-xs text-gray-500 dark:text-gray-400 mb-3" style={likeCount === 0 ? 'display: none;' : ''}>
+          <span class="liked-by-text">{likedByText}</span>
+          {otherLikes > 0 && (
+            <span class="others-text"> and {otherLikes} other{otherLikes > 1 ? 's' : ''}</span>
+          )}
+          <span> liked this</span>
+        </div>
+
+        <!-- Reply Editor (hidden by default, shown on click) -->
+        <div class="reply-editor-container hidden mt-4" data-parent-id={comment.id}>
+          <CommentEditor threadId={threadId} parentId={comment.id} />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nested Replies -->
+  {comment.replies && comment.replies.length > 0 && (
+    <div class="mt-4 space-y-4">
+      {comment.replies.map((reply) => (
+        <Astro.self comment={reply} threadId={threadId} depth={depth + 1} />
+      ))}
+    </div>
+  )}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const commentItems = document.querySelectorAll('.comment-item');
+    
+    commentItems.forEach((item) => {
+      const replyBtn = item.querySelector(':scope > div > div > div > .reply-btn') as HTMLButtonElement;
+      const quoteBtn = item.querySelector(':scope > div > div > div > .quote-btn') as HTMLButtonElement;
+      const likeBtn = item.querySelector(':scope > div > div > div > .like-btn') as HTMLButtonElement;
+      
+      // Reply button handler
+      if (replyBtn) {
+        replyBtn.addEventListener('click', () => {
+          const commentId = replyBtn.getAttribute('data-comment-id');
+          const replyContainer = item.querySelector(`.reply-editor-container[data-parent-id="${commentId}"]`);
+          
+          if (replyContainer) {
+            const isHidden = replyContainer.classList.contains('hidden');
+            
+            // Hide all other reply editors
+            document.querySelectorAll('.reply-editor-container').forEach((container) => {
+              container.classList.add('hidden');
+            });
+            
+            // Toggle current reply editor
+            if (isHidden) {
+              replyContainer.classList.remove('hidden');
+              replyContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+              replyContainer.classList.add('hidden');
+            }
+          }
+        });
+      }
+
+      // Quote button handler
+      if (quoteBtn) {
+        quoteBtn.addEventListener('click', () => {
+          const commentId = quoteBtn.getAttribute('data-comment-id');
+          // TODO: Implement quote functionality
+          console.log('Quote comment:', commentId);
+        });
+      }
+
+      // Like button handler
+      if (likeBtn) {
+        likeBtn.addEventListener('click', async () => {
+          const commentId = likeBtn.getAttribute('data-comment-id');
+          if (!commentId) return;
+          
+          const userId = 1; // Placeholder - get from auth in real app
+          
+          try {
+            const response = await fetch('/api/likes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId, commentId: parseInt(commentId) }),
+            });
+            
+            if (!response.ok) {
+              throw new Error('Failed to toggle like');
+            }
+            
+            const result = await response.json();
+            const likeCountEl = likeBtn.querySelector('.like-count');
+            const likeIcon = likeBtn.querySelector('.like-icon');
+            const likedByContainer = item.querySelector('.liked-by-container') as HTMLElement;
+            
+            if (likeCountEl) {
+              const currentCount = parseInt(likeCountEl.textContent || '0');
+              const newCount = result.action === 'liked' ? currentCount + 1 : currentCount - 1;
+              likeCountEl.textContent = newCount.toString();
+              
+              // Show/hide liked by container
+              if (likedByContainer) {
+                likedByContainer.style.display = newCount > 0 ? '' : 'none';
+              }
+            }
+            
+            // Toggle active state
+            if (result.action === 'liked') {
+              likeBtn.classList.add('text-blue-600', 'dark:text-blue-400');
+              likeBtn.classList.remove('text-gray-600', 'dark:text-gray-400');
+              likeBtn.setAttribute('data-liked', 'true');
+              if (likeIcon) {
+                likeIcon.setAttribute('fill', 'currentColor');
+              }
+            } else {
+              likeBtn.classList.remove('text-blue-600', 'dark:text-blue-400');
+              likeBtn.classList.add('text-gray-600', 'dark:text-gray-400');
+              likeBtn.setAttribute('data-liked', 'false');
+              if (likeIcon) {
+                likeIcon.setAttribute('fill', 'none');
+              }
+            }
+          } catch (error) {
+            console.error('Like error:', error);
+          }
+        });
+      }
+    });
+  });
+</script>
+
+<style>
+  @reference "../styles/global.css";
+  
+  .comment-content :global(p) {
+    @apply mb-2;
+  }
+
+  .comment-content :global(ul),
+  .comment-content :global(ol) {
+    @apply ml-6 mb-2;
+  }
+
+  .comment-content :global(ul) {
+    @apply list-disc;
+  }
+
+  .comment-content :global(ol) {
+    @apply list-decimal;
+  }
+
+  .comment-content :global(blockquote) {
+    @apply border-l-4 border-blue-500 dark:border-blue-400 pl-4 italic text-gray-700 dark:text-gray-300 my-2 bg-blue-50 dark:bg-blue-900/20 py-2 rounded-r;
+  }
+
+  .comment-content :global(a) {
+    @apply text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300;
+  }
+
+  .comment-content :global(img) {
+    @apply max-w-full h-auto rounded my-2;
+  }
+
+  .comment-content :global(code) {
+    @apply bg-neutral-100 dark:bg-neutral-700 px-1.5 py-0.5 rounded text-amber-600 dark:text-amber-400 text-sm;
+  }
+
+  .comment-content :global(pre) {
+    @apply bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-4 rounded my-2 overflow-x-auto;
+  }
+
+  .comment-content :global(pre code) {
+    @apply bg-transparent p-0 text-gray-800 dark:text-gray-200;
+  }
+  
+  .like-btn[data-liked="true"] .like-icon {
+    fill: currentColor;
+  }
+</style>

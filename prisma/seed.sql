@@ -1,5 +1,11 @@
 -- Clear existing data (optional)
+-- Note: Delete in order to respect foreign key constraints
+DELETE FROM Image;
 DELETE FROM Blog;
+DELETE FROM Comment;
+DELETE FROM Thread;
+DELETE FROM Forum;
+DELETE FROM User;
 
 -- Insert sample blog posts
 INSERT INTO Blog (slug, title, excerpt, content, image, views, createdAt, updatedAt) VALUES
@@ -118,6 +124,51 @@ Advanced topics:
 Learn how to leverage TypeScript''s advanced features to write more robust and maintainable code.',
   'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800',
   2150,
+  NOW(),
+  NOW()
+);
+
+-- Insert sample users
+INSERT INTO User (username, avatar, createdAt) VALUES
+('admin', NULL, NOW()),
+('john_doe', NULL, NOW()),
+('jane_smith', NULL, NOW()),
+('tech_enthusiast', NULL, NOW());
+
+-- Insert sample forums
+INSERT INTO Forum (name, description, slug, createdAt, updatedAt) VALUES
+(
+  'General Discussion',
+  'Talk about anything and everything. Share your thoughts, ask questions, and connect with the community.',
+  'general-discussion',
+  NOW(),
+  NOW()
+),
+(
+  'Technology',
+  'Discuss the latest in technology, programming, software development, and tech news.',
+  'technology',
+  NOW(),
+  NOW()
+),
+(
+  'Web Development',
+  'Share tips, tricks, and resources for web development. HTML, CSS, JavaScript, frameworks, and more.',
+  'web-development',
+  NOW(),
+  NOW()
+),
+(
+  'Mobile Networks',
+  'Discussions about mobile networks, carriers, plans, and connectivity.',
+  'mobile-networks',
+  NOW(),
+  NOW()
+),
+(
+  'Projects & Ideas',
+  'Share your projects, get feedback, and collaborate with others on exciting ideas.',
+  'projects-ideas',
   NOW(),
   NOW()
 );

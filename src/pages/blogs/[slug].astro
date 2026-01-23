@@ -1,16 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import prisma from "../../lib/prisma";
-export async function getStaticPaths() {
-  const blogs = await prisma.blog.findMany({
-    select: {
-      slug: true,
-    },
-  });
-  return blogs.map((blog) => ({
-    params: { slug: blog.slug },
-  }));
-}
+
 const { slug } = Astro.params;
 const blog = await prisma.blog.findUnique({
   where: {

@@ -1,0 +1,121 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import prisma from "../../../lib/prisma";
+import CommentEditor from "../../../components/CommentEditor.astro";
+import CommentList from "../../../components/CommentList.astro";
+import ThreadPostCard from "../../../components/ThreadPostCard.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import SocialSharing from "../../../components/SocialSharing.astro";
+import Pagination from "../../../components/Pagination.astro";
+
+const { forumId, threadId } = Astro.params;
+const currentPage = Number(Astro.url.searchParams.get('page') || '1');
+const commentsPerPage = 10;
+
+const thread = await prisma.thread.findFirst({
+  where: {
+    slug: threadId,
+    forum: {
+      slug: forumId,
+    },
+  },
+  include: {
+    author: true,
+    forum: true,
+    comments: {
+      where: { parentId: null },
+      include: {
+        author: true,
+        replies: {
+          include: {
+            author: true,
+            replies: {
+              include: {
+                author: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    },
+  },
+});
+
+if (!thread) {
+  return Astro.redirect("/forums");
+}
+
+// Calculate pagination
+const totalComments = thread.comments.length;
+const totalPages = Math.ceil(totalComments / commentsPerPage);
+const startIndex = (currentPage - 1) * commentsPerPage;
+const paginatedComments = thread.comments.slice(startIndex, startIndex + commentsPerPage);
+
+const currentUrl = Astro.url.href.split('?')[0];
+const shareUrl = Astro.url.origin + Astro.url.pathname;
+---
+
+<Layout title={`PL-${thread.title}`}>
+  <div class="min-h-screen bg-gray-100 dark:bg-neutral-900">
+    <div class="max-w-4xl mx-auto px-6 lg:px-12 py-8 lg:py-12">
+      <!-- Breadcrumbs -->
+      <Breadcrumbs 
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Forums', href: '/forums' },
+          { label: thread.forum.name, href: `/forums/${forumId}` },
+          { label: thread.title },
+        ]}
+      />
+
+      <!-- Thread Title -->
+      <h1 
+        class="text-neutral-900 dark:text-white mb-6" 
+        style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: clamp(36px, 6vw, 56px); line-height: 1.1; letter-spacing: -0.02em;"
+      >
+        {thread.title}
+      </h1>
+
+      <!-- Thread Post Card -->
+      <ThreadPostCard thread={thread} threadId={thread.id} />
+
+      <!-- Pagination (if needed) -->
+      {totalPages > 1 && (
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          baseUrl={currentUrl}
+        />
+      )}
+
+      <!-- Comment Editor -->
+      <div class="mb-8">
+        <CommentEditor threadId={thread.id} />
+      </div>
+
+      <!-- Social Sharing -->
+      <SocialSharing url={shareUrl} title={thread.title} />
+
+      <!-- Comments List -->
+      <div class="mt-8">
+        {paginatedComments.length === 0 ? (
+          <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-12 text-center">
+            <p class="text-gray-600 dark:text-gray-400 text-lg">No comments yet. Be the first to comment!</p>
+          </div>
+        ) : (
+          <>
+            <CommentList comments={paginatedComments} threadId={thread.id} />
+            {totalPages > 1 && (
+              <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                baseUrl={currentUrl}
+              />
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>

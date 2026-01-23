@@ -27,3 +27,81 @@ model Image {
 
   @@index([blogId], map: "Image_blogId_fkey")
 }
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  avatar    String?
+  createdAt DateTime  @default(now())
+  threads   Thread[]
+  comments  Comment[]
+  likes     Like[]
+}
+
+model Forum {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  threads     Thread[]
+
+  @@index([slug])
+}
+
+model Thread {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String    @db.LongText
+  slug        String    @unique
+  forumId     Int
+  authorId    Int
+  views       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  forum       Forum     @relation(fields: [forumId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id])
+  comments    Comment[]
+  likes       Like[]
+
+  @@index([forumId])
+  @@index([slug])
+  @@index([authorId])
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String    @db.LongText
+  threadId  Int
+  authorId  Int
+  parentId  Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  thread    Thread    @relation(fields: [threadId], references: [id])
+  author    User      @relation(fields: [authorId], references: [id])
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  likes     Like[]
+
+  @@index([threadId])
+  @@index([authorId])
+  @@index([parentId])
+}
+
+model Like {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  threadId  Int?
+  commentId Int?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  thread    Thread?   @relation(fields: [threadId], references: [id])
+  comment   Comment?  @relation(fields: [commentId], references: [id])
+
+  @@index([userId])
+  @@index([threadId])
+  @@index([commentId])
+  @@unique([userId, threadId])
+  @@unique([userId, commentId])
+}

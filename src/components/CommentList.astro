@@ -1,0 +1,28 @@
+---
+import CommentItem from './CommentItem.astro';
+
+interface Comment {
+  id: number;
+  content: string;
+  createdAt: Date;
+  author: {
+    id: number;
+    username: string;
+    avatar?: string | null;
+  };
+  replies?: Comment[];
+}
+
+interface Props {
+  comments: Comment[];
+  threadId: number;
+}
+
+const { comments, threadId } = Astro.props;
+---
+
+<div class="comment-list space-y-4">
+  {comments.map((comment) => (
+    <CommentItem comment={comment} threadId={threadId} />
+  ))}
+</div>
