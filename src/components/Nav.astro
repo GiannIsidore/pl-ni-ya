@@ -3,8 +3,7 @@ import { Image } from "astro:assets";
 import logo from "../assets/logo2.svg";
 
 // Get user info - defensive approach
-const locals = Astro.locals as any;
-const user = locals?.user;
+const user = Astro.locals.user;
 
 // Debug: Log user data to see what we're getting
 console.log('Nav component - User data:', user);

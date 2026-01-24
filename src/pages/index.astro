@@ -6,8 +6,7 @@ import AboutUs from "../components/AboutUs.astro";
 import Blogs from "../components/Blogs.astro";
 
 // Check if admin user is accessing home page and show message
-const locals = Astro.locals as any;
-const user = locals?.user;
+const user = Astro.locals.user;
 const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
 const showAdminMessage = isAdmin && Astro.url.searchParams.get('admin-redirect');
 ---

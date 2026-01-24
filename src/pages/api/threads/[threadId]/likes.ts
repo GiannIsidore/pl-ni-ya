@@ -2,6 +2,19 @@ import type { APIRoute } from 'astro';
 import prisma from '../../../../lib/prisma';
 import { getCurrentUserId } from '../../../../lib/auth-helpers';
 
+type LikeWithUser = {
+  id: number;
+  userId: string;
+  threadId: number | null;
+  commentId: number | null;
+  createdAt: Date;
+  user: {
+    id: string;
+    username: string;
+    avatar: string | null;
+  };
+};
+
 // GET /api/threads/[threadId]/likes - Get all likes for a thread
 export const GET: APIRoute = async ({ params, request }) => {
   try {
@@ -41,12 +54,12 @@ export const GET: APIRoute = async ({ params, request }) => {
     // Check if current user has liked
     let hasLiked = false;
     if (currentUserId) {
-      hasLiked = likes.some(like => like.userId === currentUserId);
+      hasLiked = likes.some((like: LikeWithUser) => like.userId === currentUserId);
     }
 
     // Format "who liked" display
     const likeCount = likes.length;
-    const firstThree = likes.slice(0, 3).map(like => like.user.username);
+    const firstThree = likes.slice(0, 3).map((like: LikeWithUser) => like.user.username);
     const remaining = likeCount - 3;
 
     let likedByText = '';
@@ -69,7 +82,7 @@ export const GET: APIRoute = async ({ params, request }) => {
         likeCount,
         likedByText,
         hasLiked,
-        users: likes.map(like => like.user),
+        users: likes.map((like: LikeWithUser) => like.user),
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );

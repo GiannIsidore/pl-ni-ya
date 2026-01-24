@@ -1,24 +1,26 @@
-import { PrismaClient } from '@prisma/client';
-import { auth } from '../../../lib/auth';
+import prisma from '../../../lib/prisma';
+import { requireRole } from '../../../lib/authorization';
 
-const prisma = new PrismaClient();
+type AuditLogWithPerformer = {
+  id: number;
+  action: string;
+  targetType: string;
+  targetId: string;
+  performedBy: string;
+  details: string | null;
+  ipAddress: string | null;
+  createdAt: Date;
+  performer: {
+    username: string;
+    name: string | null;
+  };
+};
 
 export async function GET({ request }: { request: Request }) {
-	// Get session and check permissions
-	const session = await auth.api.getSession({
-		headers: request.headers,
-	});
-
-	// Defensive role checking
-	const userRole = (session?.user as any)?.role;
-	if (!session?.user || (userRole !== 'ADMIN' && userRole !== 'MODERATOR')) {
-		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-			status: 401,
-			headers: { 'Content-Type': 'application/json' }
-		});
-	}
-
 	try {
+		// Require MODERATOR or higher role (checks session, DB, ban, and role)
+		await requireRole(request, 'MODERATOR');
+
 		// Calculate date ranges
 		const now = new Date();
 		const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -79,7 +81,7 @@ export async function GET({ request }: { request: Request }) {
 		});
 
 		// Format recent activity
-		const formattedActivity = recentActivity.map(log => ({
+		const formattedActivity = recentActivity.map((log: AuditLogWithPerformer) => ({
 			description: `${log.performer.username || log.performer.name} ${log.action.toLowerCase()} ${log.targetType} #${log.targetId}`,
 			timestamp: new Date(log.createdAt).toLocaleString(),
 			action: log.action,
@@ -112,6 +114,11 @@ export async function GET({ request }: { request: Request }) {
 		});
 
 	} catch (error) {
+		// If error is already a Response (from requireRole), return it
+		if (error instanceof Response) {
+			return error;
+		}
+
 		console.error('Error fetching admin stats:', error);
 		return new Response(JSON.stringify({ 
 			error: 'Internal server error',
@@ -120,7 +127,5 @@ export async function GET({ request }: { request: Request }) {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' }
 		});
-	} finally {
-		await prisma.$disconnect();
 	}
 }

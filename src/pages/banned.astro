@@ -1,0 +1,144 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Get ban information from query params
+const reason = Astro.url.searchParams.get('reason') || 'Your account has been suspended';
+const until = Astro.url.searchParams.get('until');
+
+// If user has session, they should be logged out
+const { user } = Astro.locals;
+if (user) {
+  // Session exists but user is banned - this shouldn't happen with middleware
+  // but handle it gracefully
+}
+---
+
+<Layout title="Account Suspended - Project Likha">
+  <main class="min-h-screen bg-neutral-900 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-2xl">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <div class="w-24 h-24 mx-auto mb-6 bg-red-900/20 rounded-full flex items-center justify-center">
+          <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h1 class="text-4xl font-bold text-white mb-2" style="font-family: 'Bebas Neue', sans-serif;">
+          Account Suspended
+        </h1>
+        <p class="text-gray-400 text-lg">
+          Your account has been temporarily suspended from Project Likha
+        </p>
+      </div>
+
+      <!-- Ban Details Card -->
+      <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-8 mb-6">
+        <div class="space-y-6">
+          <!-- Reason -->
+          <div>
+            <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Reason for Suspension
+            </h2>
+            <p class="text-white text-lg">
+              {reason}
+            </p>
+          </div>
+
+          {until && (
+            <div>
+              <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                Suspension Until
+              </h2>
+              <p class="text-white text-lg">
+                {new Date(until).toLocaleString('en-US', { 
+                  dateStyle: 'full', 
+                  timeStyle: 'short' 
+                })}
+              </p>
+            </div>
+          )}
+
+          {!until && (
+            <div>
+              <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                Duration
+              </h2>
+              <p class="text-white text-lg">
+                Permanent
+              </p>
+            </div>
+          )}
+
+          <!-- What This Means -->
+          <div class="border-t border-neutral-700 pt-6">
+            <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+              What This Means
+            </h2>
+            <ul class="space-y-2 text-gray-300">
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span>You cannot create new threads or posts</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span>You cannot comment or reply to existing threads</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span>You cannot like or interact with content</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>You can still browse and read content</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="border-t border-neutral-700 pt-6">
+            <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+              Questions or Concerns?
+            </h2>
+            <p class="text-gray-300 mb-4">
+              If you believe this suspension was made in error or would like to appeal, please contact the moderation team.
+            </p>
+            <a 
+              href="mailto:support@projectlikha.com" 
+              class="inline-flex items-center px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Contact Support
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="text-center space-y-4">
+        <a 
+          href="/" 
+          class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Return to Homepage
+        </a>
+        
+        <p class="text-gray-500 text-sm">
+          You can still browse forums and blogs
+        </p>
+      </div>
+    </div>
+  </main>
+</Layout>

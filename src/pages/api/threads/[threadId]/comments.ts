@@ -1,14 +1,11 @@
 import type { APIRoute } from 'astro';
 import prisma from '../../../../lib/prisma';
-import { getCurrentUserId, unauthorizedResponse } from '../../../../lib/auth-helpers';
+import { requireVerifiedUser } from '../../../../lib/authorization';
 
 export const POST: APIRoute = async ({ params, request }) => {
   try {
-    // Get authenticated user
-    const userId = await getCurrentUserId(request);
-    if (!userId) {
-      return unauthorizedResponse();
-    }
+    // Require verified user (checks session, DB existence, and ban status)
+    const user = await requireVerifiedUser(request);
 
     const threadId = parseInt(params.threadId!);
     const body = await request.json();
@@ -51,7 +48,7 @@ export const POST: APIRoute = async ({ params, request }) => {
       data: {
         content,
         threadId,
-        authorId: userId,
+        authorId: user.id,
         parentId: parentId ? parseInt(parentId) : null,
       },
       include: {
@@ -65,6 +62,11 @@ export const POST: APIRoute = async ({ params, request }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
+    // If error is already a Response (from requireVerifiedUser), return it
+    if (error instanceof Response) {
+      return error;
+    }
+    
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to create comment' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

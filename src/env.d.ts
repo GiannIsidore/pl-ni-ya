@@ -1,13 +1,14 @@
 /// <reference types="astro/client" />
 
-import type { auth } from "./lib/auth";
-
-type Session = typeof auth.$Infer.Session.session;
-type User = typeof auth.$Infer.Session.user;
+import type { AuthSession, AuthUser } from "./types/auth";
 
 declare namespace App {
   interface Locals {
-    session: Session | null;
-    user: User | null;
+    /** Session data from Better Auth (may be stale) */
+    session: AuthSession['session'] | null;
+    /** User data from session (may be stale) */
+    user: AuthSession['user'] | null;
+    /** Fresh user data verified from database (always current) */
+    verifiedUser: AuthUser | null;
   }
 }
