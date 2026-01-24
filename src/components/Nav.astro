@@ -13,7 +13,8 @@ console.log('Nav component - User role:', user?.role);
 const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
 ---
 
-<nav class="w-[100%] m-0 p-0 bg-neutral-900 pb-1 text-white py-4 flex items-center justify-between sticky top-0 z-50">
+<nav class="w-[100%] m-0 p-0 bg-neutral-900 pb-1 text-white py-4 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-lg">
+  <!-- <div class="bg-neutral-900/80 backdrop-blur-md border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"> glassmorphism effect eme if u want try dis instead of sa taas -->
   <div class="max-w-7xl mx-auto w-full px-6 lg:px-12 flex items-center justify-between">
     <div>
       <a href="/">
@@ -74,7 +75,7 @@ const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
         <!-- Dropdown Menu -->
         <div 
           id="user-dropdown" 
-          class="absolute right-0 top-full mt-2 w-48 bg-neutral-800 rounded-lg border border-neutral-700 shadow-xl hidden"
+          class="absolute right-0 top-full mt-2 w-48 bg-neutral-800/90 backdrop-blur-md rounded-lg border border-white/10 shadow-xl hidden"
         >
           <div class="px-4 py-3 border-b border-neutral-700">
             <p class="text-sm font-medium text-white truncate">{user.username || user.name}</p>
