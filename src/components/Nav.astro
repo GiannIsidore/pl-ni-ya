@@ -2,7 +2,16 @@
 import { Image } from "astro:assets";
 import logo from "../assets/logo2.svg";
 
-const { user } = Astro.locals;
+// Get user info - defensive approach
+const locals = Astro.locals as any;
+const user = locals?.user;
+
+// Debug: Log user data to see what we're getting
+console.log('Nav component - User data:', user);
+console.log('Nav component - User role:', user?.role);
+
+// Check if user is admin or moderator
+const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
 ---
 
 <nav class="w-[100%] bg-neutral-900 pb-1 text-white px-6 lg:px-12 py-4 flex items-center justify-between sticky top-0 z-50">
@@ -26,6 +35,14 @@ const { user } = Astro.locals;
       <a href="#" class="hover:text-gray-300 transition-colors nav-link">About us</a>
       <a href="#" class="hover:text-gray-300 transition-colors nav-link">Ideas</a>
       <a href="#" class="hover:text-gray-300 transition-colors nav-link">Projects</a>
+      {isAdmin && (
+        <a href="/admin" class="hover:text-blue-300 transition-colors nav-link text-blue-400 font-semibold">
+          <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v7a2 2 0 002-2h3a2 2 0 002-2v-7m-9 4v8a3 3 0 013-3h3a3 3 0 013-3v-2m6 5a2 2 0 012-2v-2H8a2 2 0 00-2 2z"/>
+          </svg>
+          Admin Dashboard
+        </a>
+      )}
     </div>
 
     <!-- Auth Section -->
@@ -64,6 +81,14 @@ const { user } = Astro.locals;
             <p class="text-xs text-gray-400 truncate">{user.email}</p>
           </div>
           <div class="py-1">
+            {isAdmin && (
+              <a href="/admin" class="block px-4 py-2 text-sm text-blue-400 hover:bg-neutral-700 transition-colors">
+                <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v7a2 2 0 002-2h3a2 2 0 002-2v-7m-9 4v8a3 3 0 013-3h3a3 3 0 013-3v-2m6 5a2 2 0 012-2v-2H8a2 2 0 00-2 2z"/>
+                </svg>
+                Admin Dashboard
+              </a>
+            )}
             <a href="/profile" class="block px-4 py-2 text-sm text-gray-300 hover:bg-neutral-700 transition-colors">
               Profile
             </a>

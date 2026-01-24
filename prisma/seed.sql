@@ -1,11 +1,26 @@
 -- Clear existing data (optional)
 -- Note: Delete in order to respect foreign key constraints
+DELETE FROM `Like`;
 DELETE FROM Image;
-DELETE FROM Blog;
 DELETE FROM Comment;
 DELETE FROM Thread;
-DELETE FROM Forum;
+DELETE FROM Blog;
+DELETE FROM AuditLog;
 DELETE FROM User;
+
+-- Create Admin User for Testing
+INSERT INTO User (id, email, name, username, role, emailVerified, isBanned, createdAt, updatedAt)
+VALUES (
+  'admin-user-001',
+  'admin@pl-niya.com',
+  'Admin User',
+  'admin',
+  'ADMIN',
+  true,
+  false,
+  NOW(),
+  NOW()
+);
 
 -- Insert sample blog posts
 INSERT INTO Blog (slug, title, excerpt, content, image, views, createdAt, updatedAt) VALUES

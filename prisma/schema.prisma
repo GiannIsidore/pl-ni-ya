@@ -1,22 +1,55 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "mysql"
 }
 
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ThreadStatus {
+  OPEN
+  CLOSED
+  RESOLVED
+}
+
 model Blog {
-  id        Int      @id @default(autoincrement())
-  slug      String   @unique
-  title     String
-  excerpt   String   @db.Text
-  content   String   @db.LongText
-  views     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  image     Image[]
+  id          Int        @id @default(autoincrement())
+  slug        String     @unique
+  title       String
+  excerpt     String     @db.Text
+  content     String     @db.LongText
+  views       Int        @default(0)
+  status      BlogStatus @default(DRAFT)
+  isFeatured  Boolean    @default(false)
+  publishedAt DateTime?
+  readTime    Int?       // Estimated reading time in minutes
+  categoryId  Int?
+  authorId    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  image       Image[]
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  author      User?      @relation(fields: [authorId], references: [id])
+  tags        BlogTag[]
+
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([isFeatured])
 }
 
 model Image {
@@ -35,13 +68,24 @@ model User {
   emailVerified Boolean   @default(false)
   name          String?
   avatar        String?   @db.Text
+  role          Role      @default(USER)
+  isBanned      Boolean   @default(false)
+  bannedAt      DateTime?
+  bannedBy      String?
+  banReason     String?   @db.Text
+  bannedUntil   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
+  auditLogs     AuditLog[]
+  blogs         Blog[]
   comments      Comment[]
   likes         Like[]
   sessions      Session[]
   threads       Thread[]
+
+  @@index([role])
+  @@index([isBanned])
 }
 
 model Session {
@@ -102,23 +146,29 @@ model Forum {
 }
 
 model Thread {
-  id        Int       @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   title     String
-  content   String    @db.LongText
-  slug      String    @unique
+  content   String       @db.LongText
+  slug      String       @unique
   forumId   Int
   authorId  String
-  views     Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  status    ThreadStatus @default(OPEN)
+  isLocked  Boolean      @default(false)
+  isPinned  Boolean      @default(false)
+  views     Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   comments  Comment[]
   likes     Like[]
-  author    User      @relation(fields: [authorId], references: [id])
-  forum     Forum     @relation(fields: [forumId], references: [id])
+  author    User         @relation(fields: [authorId], references: [id])
+  forum     Forum        @relation(fields: [forumId], references: [id])
 
   @@index([forumId])
   @@index([slug])
   @@index([authorId])
+  @@index([status])
+  @@index([isLocked])
+  @@index([isPinned])
 }
 
 model Comment {
@@ -155,4 +205,52 @@ model Like {
   @@index([userId])
   @@index([threadId])
   @@index([commentId])
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  slug  String @unique
+  blogs BlogTag[]
+
+  @@index([slug])
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String?  // Optional category icon
+  blogs       Blog[]
+
+  @@index([slug])
+}
+
+model BlogTag {
+  blogId Int
+  tagId  Int
+  blog   Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([blogId, tagId])
+  @@index([blogId])
+  @@index([tagId])
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  action      String   // e.g., "BAN_USER", "DELETE_THREAD", "EDIT_BLOG"
+  targetType  String   // e.g., "User", "Thread", "Blog"
+  targetId    String
+  performedBy String   // User ID of admin/mod
+  details     String?  @db.Text // JSON with additional context
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+  
+  performer   User     @relation(fields: [performedBy], references: [id])
+  
+  @@index([performedBy])
+  @@index([createdAt])
+  @@index([targetType, targetId])
 }

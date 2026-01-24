@@ -1,0 +1,1 @@
+SELECT id, email, username, role, emailVerified, isBanned, createdAt, updatedAt FROM User WHERE email = 'admin@pl-niya.com';

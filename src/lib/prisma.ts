@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 const connectionString = process.env.DATABASE_URL;
@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== "production") {
     try {
       // Disconnect existing client before clearing
       if (globalForPrisma.prisma && typeof (globalForPrisma.prisma as any).$disconnect === 'function') {
-        (globalForPrisma.prisma as any).$disconnect().catch(() => {});
+        (globalForPrisma.prisma as any).$disconnect().catch(() => { });
       }
     } catch {
       // Ignore disconnect errors
