@@ -590,8 +590,8 @@
 | Priority | Phase | Estimated Effort |
 |----------|-------|------------------|
 | ✅ Complete | Phase 1: Schema | 2-3 hours |
-| ✅ Complete | Phase 1.5: RBAC | 4-5 hours |
-| ✅ Complete | Phase 1.6: Admin Panel | 8-12 hours |
+| 🔴 High | Phase 1.5: RBAC | 4-5 hours |
+| 🔴 High | Phase 1.6: Admin Panel | 8-12 hours |
 | 🔴 High | Phase 2: Tags | 3-4 hours |
 | 🔴 High | Phase 5: Pagination | 2-3 hours |
 | 🔴 High | Phase 6: Lazy Loading | 2-3 hours |
