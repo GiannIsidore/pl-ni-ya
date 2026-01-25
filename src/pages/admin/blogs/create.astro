@@ -1,0 +1,608 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+
+// Get user info for validation
+const locals = Astro.locals as any;
+const user = locals?.user;
+
+// Check if user has admin or moderator role
+const hasAdminAccess = user?.role === "ADMIN" || user?.role === "MODERATOR";
+
+if (!hasAdminAccess) {
+	return Astro.redirect("/login");
+}
+---
+
+<AdminLayout title="Create Blog">
+	<div class="max-w-4xl mx-auto pb-12">
+		<!-- Header -->
+		<div class="mb-8">
+			<h1 class="text-4xl font-normal text-white mb-3 tracking-tight" style="font-family: 'Bebas Neue', sans-serif;">
+				Create New Blog
+			</h1>
+			<p class="text-neutral-400 text-lg" style="font-family: 'Schibsted Grotesk', sans-serif;">
+				Write and publish a new blog post for the community.
+			</p>
+		</div>
+
+		<!-- Blog Form -->
+		<form id="blog-form" class="space-y-8">
+			<!-- Title Input -->
+			<div>
+				<label for="title" class="block text-white font-semibold mb-3" style="font-family: 'Schibsted Grotesk', sans-serif;">
+					Blog Title
+				</label>
+				<input 
+					type="text" 
+					id="title" 
+					name="title"
+					required
+					placeholder="Enter an engaging title for your blog post"
+					class="w-full px-6 py-4 bg-neutral-800 border border-neutral-700 rounded-2xl text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+					style="font-family: 'Schibsted Grotesk', sans-serif;"
+				/>
+			</div>
+
+			<!-- Excerpt Input -->
+			<div>
+				<label for="excerpt" class="block text-white font-semibold mb-3" style="font-family: 'Schibsted Grotesk', sans-serif;">
+					Excerpt
+				</label>
+				<textarea 
+					id="excerpt" 
+					name="excerpt"
+					rows="3"
+					placeholder="Write a brief summary of your blog post (2-3 sentences)"
+					class="w-full px-6 py-4 bg-neutral-800 border border-neutral-700 rounded-2xl text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 resize-none"
+					style="font-family: 'Schibsted Grotesk', sans-serif;"
+				></textarea>
+			</div>
+
+			<!-- Rich Text Editor -->
+			<div>
+				<label for="content" class="block text-white font-semibold mb-3" style="font-family: 'Schibsted Grotesk', sans-serif;">
+					Content
+				</label>
+				
+				<!-- Editor Toolbar -->
+				<div class="bg-neutral-800 border border-neutral-700 rounded-t-2xl p-4 flex flex-wrap items-center gap-2 border-b-0">
+					<!-- Text Formatting -->
+					<div class="flex items-center gap-1 px-2 py-1 bg-neutral-700 rounded-lg">
+						<button type="button" id="bold-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Bold">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
+							</svg>
+						</button>
+						<button type="button" id="italic-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Italic">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
+							</svg>
+						</button>
+						<button type="button" id="underline-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Underline">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
+							</svg>
+						</button>
+						<div class="w-px h-6 bg-neutral-600 mx-1"></div>
+						<button type="button" id="strikethrough-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Strikethrough">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/>
+							</svg>
+						</button>
+					</div>
+
+					<!-- Heading Styles -->
+					<div class="flex items-center gap-1 px-2 py-1 bg-neutral-700 rounded-lg">
+						<button type="button" id="heading-h1-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Heading 1">
+							<span class="text-white font-bold text-sm">H1</span>
+						</button>
+						<button type="button" id="heading-h2-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Heading 2">
+							<span class="text-white font-bold text-sm">H2</span>
+						</button>
+						<button type="button" id="heading-h3-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Heading 3">
+							<span class="text-white font-bold text-sm">H3</span>
+						</button>
+					</div>
+
+					<!-- Lists -->
+					<div class="flex items-center gap-1 px-2 py-1 bg-neutral-700 rounded-lg">
+						<button type="button" id="ul-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Unordered List">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/>
+							</svg>
+						</button>
+						<button type="button" id="ol-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Ordered List">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.5L4 13.5v.5h2v-1H4.5L5 11.5V11H3v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/>
+							</svg>
+						</button>
+					</div>
+
+					<!-- Alignment -->
+					<div class="flex items-center gap-1 px-2 py-1 bg-neutral-700 rounded-lg">
+						<button type="button" id="align-left-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Align Left">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 3h18v2H3zm0 4h12v2H3zm0 4h18v2H3zm0 4h12v2H3z"/>
+							</svg>
+						</button>
+						<button type="button" id="align-center-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Align Center">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 3h18v2H3zm3 4h12v2H6zm-3 4h18v2H3zm3 4h12v2H6z"/>
+							</svg>
+						</button>
+						<button type="button" id="align-right-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Align Right">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 3h18v2H3zm6 4h12v2H9zm-6 4h18v2H3zm6 4h12v2H9z"/>
+							</svg>
+						</button>
+					</div>
+
+					<!-- Links & Media -->
+					<div class="flex items-center gap-1 px-2 py-1 bg-neutral-700 rounded-lg">
+						<button type="button" id="link-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Insert Link">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+							</svg>
+						</button>
+						<button type="button" id="image-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Insert Image">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+							</svg>
+						</button>
+						<button type="button" id="code-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Code Block">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+							</svg>
+						</button>
+					</div>
+
+					<!-- Other -->
+					<div class="flex items-center gap-1 px-2 py-1 bg-neutral-700 rounded-lg">
+						<button type="button" id="quote-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Blockquote">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+							</svg>
+						</button>
+						<button type="button" id="hr-btn" class="editor-btn p-2 hover:bg-neutral-600 rounded transition-colors" title="Horizontal Rule">
+							<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 12h18v-2H3v2z"/>
+							</svg>
+						</button>
+					</div>
+				</div>
+
+				<!-- Editor Content Area -->
+				<div 
+					id="editor" 
+					contenteditable="true"
+					class="min-h-[400px] px-6 py-4 bg-neutral-800 border border-neutral-700 rounded-b-2xl text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+					style="font-family: 'Schibsted Grotesk', sans-serif; line-height: 1.6;"
+					data-placeholder="Start writing your blog post..."
+				></div>
+
+				<!-- Hidden input to store content -->
+				<input type="hidden" id="content" name="content" />
+			</div>
+
+			<!-- Featured Image Upload -->
+			<div>
+				<label for="featured-image" class="block text-white font-semibold mb-3" style="font-family: 'Schibsted Grotesk', sans-serif;">
+					Featured Image
+				</label>
+				<div class="border-2 border-dashed border-neutral-600 rounded-2xl p-8 text-center hover:border-blue-500 transition-colors duration-300">
+					<input type="file" id="featured-image" accept="image/*" class="hidden" />
+					<div id="image-preview" class="mb-4">
+						<svg class="w-16 h-16 text-neutral-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+						</svg>
+					</div>
+					<button type="button" id="upload-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-300">
+						Choose Image
+					</button>
+					<p class="text-neutral-400 text-sm mt-3">
+						Upload a featured image for your blog post (JPG, PNG, WebP - Max 5MB)
+					</p>
+				</div>
+			</div>
+
+			<!-- Tags -->
+			<div>
+				<label for="tags" class="block text-white font-semibold mb-3" style="font-family: 'Schibsted Grotesk', sans-serif;">
+					Tags
+				</label>
+				<input 
+					type="text" 
+					id="tags" 
+					name="tags"
+					placeholder="Enter tags separated by commas (e.g., technology, programming, tutorial)"
+					class="w-full px-6 py-4 bg-neutral-800 border border-neutral-700 rounded-2xl text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+					style="font-family: 'Schibsted Grotesk', sans-serif;"
+				/>
+			</div>
+
+			<!-- Status -->
+			<div>
+				<label class="block text-white font-semibold mb-3" style="font-family: 'Schibsted Grotesk', sans-serif;">
+					Publish Status
+				</label>
+				<div class="flex gap-4">
+					<label class="flex items-center gap-3 px-6 py-3 bg-neutral-800 border border-neutral-700 rounded-xl cursor-pointer hover:border-blue-500 transition-colors">
+						<input type="radio" name="status" value="draft" class="text-blue-600" checked />
+						<span class="text-white">Draft</span>
+					</label>
+					<label class="flex items-center gap-3 px-6 py-3 bg-neutral-800 border border-neutral-700 rounded-xl cursor-pointer hover:border-blue-500 transition-colors">
+						<input type="radio" name="status" value="published" class="text-blue-600" />
+						<span class="text-white">Published</span>
+					</label>
+				</div>
+			</div>
+
+			<!-- Action Buttons -->
+			<div class="flex gap-4 pt-6">
+				<button 
+					type="submit" 
+					class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-300 shadow-lg hover:shadow-blue-600/25"
+					style="font-family: 'Schibsted Grotesk', sans-serif;"
+				>
+					Publish Blog
+				</button>
+				<button 
+					type="button" 
+					id="save-draft-btn"
+					class="px-8 py-4 bg-neutral-700 hover:bg-neutral-600 text-white font-semibold rounded-xl transition-colors duration-300"
+					style="font-family: 'Schibsted Grotesk', sans-serif;"
+				>
+					Save Draft
+				</button>
+				<a 
+					href="/admin" 
+					class="px-8 py-4 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-xl transition-colors duration-300 inline-flex items-center justify-center"
+					style="font-family: 'Schibsted Grotesk', sans-serif;"
+				>
+					Cancel
+				</a>
+			</div>
+		</form>
+	</div>
+</AdminLayout>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+	const editor = document.getElementById('editor') as HTMLElement;
+	const contentInput = document.getElementById('content') as HTMLInputElement;
+	const form = document.getElementById('blog-form') as HTMLFormElement;
+	const saveDraftBtn = document.getElementById('save-draft-btn');
+	
+	// Editor functionality
+	const boldBtn = document.getElementById('bold-btn');
+	const italicBtn = document.getElementById('italic-btn');
+	const underlineBtn = document.getElementById('underline-btn');
+	const strikethroughBtn = document.getElementById('strikethrough-btn');
+	const headingH1Btn = document.getElementById('heading-h1-btn');
+	const headingH2Btn = document.getElementById('heading-h2-btn');
+	const headingH3Btn = document.getElementById('heading-h3-btn');
+	const ulBtn = document.getElementById('ul-btn');
+	const olBtn = document.getElementById('ol-btn');
+	const alignLeftBtn = document.getElementById('align-left-btn');
+	const alignCenterBtn = document.getElementById('align-center-btn');
+	const alignRightBtn = document.getElementById('align-right-btn');
+	const linkBtn = document.getElementById('link-btn');
+	const imageBtn = document.getElementById('image-btn');
+	const codeBtn = document.getElementById('code-btn');
+	const quoteBtn = document.getElementById('quote-btn');
+	const hrBtn = document.getElementById('hr-btn');
+
+	// Text formatting commands
+	function execCommand(command: string, value?: string) {
+		document.execCommand(command, false, value);
+		editor?.focus();
+	}
+
+	// Bold
+	boldBtn?.addEventListener('click', () => execCommand('bold'));
+	
+	// Italic
+	italicBtn?.addEventListener('click', () => execCommand('italic'));
+	
+	// Underline
+	underlineBtn?.addEventListener('click', () => execCommand('underline'));
+	
+	// Strikethrough
+	strikethroughBtn?.addEventListener('click', () => execCommand('strikeThrough'));
+	
+	// Headings
+	headingH1Btn?.addEventListener('click', () => {
+		const selection = window.getSelection();
+		if (selection && selection.rangeCount > 0) {
+			const range = selection.getRangeAt(0);
+			const selectedText = range.toString() || 'Heading 1';
+			const h1 = document.createElement('h1');
+			h1.textContent = selectedText;
+			h1.className = 'text-3xl font-bold mb-4 mt-6';
+			range.deleteContents();
+			range.insertNode(h1);
+		}
+	});
+	
+	headingH2Btn?.addEventListener('click', () => {
+		const selection = window.getSelection();
+		if (selection && selection.rangeCount > 0) {
+			const range = selection.getRangeAt(0);
+			const selectedText = range.toString() || 'Heading 2';
+			const h2 = document.createElement('h2');
+			h2.textContent = selectedText;
+			h2.className = 'text-2xl font-bold mb-3 mt-5';
+			range.deleteContents();
+			range.insertNode(h2);
+		}
+	});
+	
+	headingH3Btn?.addEventListener('click', () => {
+		const selection = window.getSelection();
+		if (selection && selection.rangeCount > 0) {
+			const range = selection.getRangeAt(0);
+			const selectedText = range.toString() || 'Heading 3';
+			const h3 = document.createElement('h3');
+			h3.textContent = selectedText;
+			h3.className = 'text-xl font-bold mb-2 mt-4';
+			range.deleteContents();
+			range.insertNode(h3);
+		}
+	});
+	
+	// Lists
+	ulBtn?.addEventListener('click', () => execCommand('insertUnorderedList'));
+	olBtn?.addEventListener('click', () => execCommand('insertOrderedList'));
+	
+	// Alignment
+	alignLeftBtn?.addEventListener('click', () => execCommand('justifyLeft'));
+	alignCenterBtn?.addEventListener('click', () => execCommand('justifyCenter'));
+	alignRightBtn?.addEventListener('click', () => execCommand('justifyRight'));
+	
+	// Link
+	linkBtn?.addEventListener('click', () => {
+		const url = prompt('Enter URL:');
+		if (url) execCommand('createLink', url);
+	});
+	
+	// Image
+	imageBtn?.addEventListener('click', () => {
+		const url = prompt('Enter image URL:');
+		if (url) execCommand('insertImage', url);
+	});
+	
+	// Code
+	codeBtn?.addEventListener('click', () => {
+		const selection = window.getSelection();
+		if (selection && selection.rangeCount > 0) {
+			const range = selection.getRangeAt(0);
+			const selectedText = range.toString() || 'code';
+			const code = document.createElement('code');
+			code.textContent = selectedText;
+			code.className = 'bg-neutral-700 px-2 py-1 rounded text-amber-400';
+			range.deleteContents();
+			range.insertNode(code);
+		}
+	});
+	
+	// Blockquote
+	quoteBtn?.addEventListener('click', () => {
+		const selection = window.getSelection();
+		if (selection && selection.rangeCount > 0) {
+			const range = selection.getRangeAt(0);
+			const selectedText = range.toString() || 'Quote';
+			const blockquote = document.createElement('blockquote');
+			blockquote.textContent = selectedText;
+			blockquote.className = 'border-l-4 border-blue-400 pl-4 italic text-gray-300 my-2 bg-blue-900/20 py-2 rounded-r';
+			range.deleteContents();
+			range.insertNode(blockquote);
+		}
+	});
+	
+	// Horizontal Rule
+	hrBtn?.addEventListener('click', () => execCommand('insertHorizontalRule'));
+	
+	// Update hidden content input
+	editor?.addEventListener('input', () => {
+		if (contentInput) {
+			contentInput.value = editor?.innerHTML || '';
+		}
+	});
+	
+	// Form submission
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		
+		// Update content input before submission
+		if (contentInput && editor) {
+			contentInput.value = editor.innerHTML;
+		}
+		
+		const formData = new FormData(form);
+		const tagsValue = formData.get('tags') as string;
+		const blogData = {
+			title: formData.get('title'),
+			excerpt: formData.get('excerpt'),
+			content: formData.get('content'),
+			tags: tagsValue ? tagsValue.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag) : [],
+			status: formData.get('status')
+		};
+		
+		try {
+			const response = await fetch('/api/admin/blogs', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(blogData)
+			});
+			
+			if (response.ok) {
+				alert('Blog created successfully!');
+				window.location.href = '/admin';
+			} else {
+				const error = await response.json();
+				alert('Error creating blog: ' + error.message);
+			}
+		} catch (error) {
+			console.error('Error creating blog:', error);
+			alert('Error creating blog. Please try again.');
+		}
+	});
+	
+	// Save draft
+	saveDraftBtn?.addEventListener('click', async () => {
+		// Update content input
+		if (contentInput && editor) {
+			contentInput.value = editor.innerHTML;
+		}
+		
+		const formData = new FormData(form);
+		const tagsValue = formData.get('tags') as string;
+		const blogData = {
+			title: formData.get('title'),
+			excerpt: formData.get('excerpt'),
+			content: formData.get('content'),
+			tags: tagsValue ? tagsValue.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag) : [],
+			status: 'draft'
+		};
+		
+		try {
+			const response = await fetch('/api/admin/blogs', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(blogData)
+			});
+			
+			if (response.ok) {
+				alert('Draft saved successfully!');
+			} else {
+				const error = await response.json();
+				alert('Error saving draft: ' + error.message);
+			}
+		} catch (error) {
+			console.error('Error saving draft:', error);
+			alert('Error saving draft. Please try again.');
+		}
+	});
+	
+	// Image upload
+	const uploadBtn = document.getElementById('upload-btn');
+	const fileInput = document.getElementById('featured-image') as HTMLInputElement;
+	const imagePreview = document.getElementById('image-preview');
+	
+	uploadBtn?.addEventListener('click', () => {
+		fileInput?.click();
+	});
+	
+	fileInput?.addEventListener('change', (e) => {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				if (imagePreview) {
+					imagePreview.innerHTML = `
+						<img src="${e.target?.result}" alt="Preview" class="max-w-full h-auto max-h-64 mx-auto rounded-lg mb-4" />
+					`;
+				}
+			};
+			reader.readAsDataURL(file);
+		}
+	});
+});
+</script>
+
+<style>
+	#editor {
+		outline: none;
+	}
+	
+	#editor:focus {
+		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+	}
+	
+	#editor h1 {
+		font-size: 1.875rem;
+		font-weight: 700;
+		margin-bottom: 1rem;
+		margin-top: 1.5rem;
+		color: white;
+	}
+	
+	#editor h2 {
+		font-size: 1.5rem;
+		font-weight: 700;
+		margin-bottom: 0.75rem;
+		margin-top: 1.25rem;
+		color: white;
+	}
+	
+	#editor h3 {
+		font-size: 1.25rem;
+		font-weight: 700;
+		margin-bottom: 0.5rem;
+		margin-top: 1rem;
+		color: white;
+	}
+	
+	#editor ul {
+		list-style-type: disc;
+		margin-left: 1.5rem;
+		margin-bottom: 0.5rem;
+		color: rgb(209 213 219);
+	}
+	
+	#editor ol {
+		list-style-type: decimal;
+		margin-left: 1.5rem;
+		margin-bottom: 0.5rem;
+		color: rgb(209 213 219);
+	}
+	
+	#editor blockquote {
+		border-left: 4px solid rgb(96 165 250);
+		padding-left: 1rem;
+		font-style: italic;
+		color: rgb(209 213 219);
+		margin: 0.5rem 0;
+		background-color: rgba(59, 130, 246, 0.1);
+		padding: 0.5rem 1rem;
+		border-radius: 0 0.5rem 0.5rem 0;
+	}
+	
+	#editor code {
+		background-color: rgb(64 64 64);
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.25rem;
+		color: rgb(251 191 36);
+		font-size: 0.875rem;
+	}
+	
+	#editor a {
+		color: rgb(96 165 250);
+		text-decoration: underline;
+	}
+	
+	#editor a:hover {
+		color: rgb(147 197 253);
+	}
+	
+	#editor img {
+		max-width: 100%;
+		height: auto;
+		border-radius: 0.5rem;
+		margin: 0.5rem 0;
+	}
+	
+	#editor hr {
+		border-color: rgb(64 64 64);
+		margin: 1rem 0;
+	}
+	
+	.editor-btn:active {
+		background-color: rgb(75 85 99);
+	}
+</style>
