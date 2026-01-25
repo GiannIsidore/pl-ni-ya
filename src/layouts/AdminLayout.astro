@@ -9,8 +9,7 @@ interface Props {
 const { title, description = "Admin Dashboard - Project Likha" } = Astro.props;
 
 // Get user info - defensive approach
-const locals = Astro.locals as any;
-const user = locals?.user;
+const user = Astro.locals.user;
 
 // Check if user has admin or moderator role
 const hasAdminAccess = user?.role === "ADMIN" || user?.role === "MODERATOR";

@@ -26,13 +26,13 @@ if (process.env.NODE_ENV !== "production") {
     // Always clear in development to pick up schema changes
     try {
       // Disconnect existing client before clearing
-      if (globalForPrisma.prisma && typeof (globalForPrisma.prisma as any).$disconnect === 'function') {
-        (globalForPrisma.prisma as any).$disconnect().catch(() => { });
+      if (globalForPrisma.prisma && '$disconnect' in globalForPrisma.prisma) {
+        globalForPrisma.prisma.$disconnect().catch(() => { });
       }
     } catch {
       // Ignore disconnect errors
     }
-    delete (globalForPrisma as any).prisma;
+    globalForPrisma.prisma = undefined;
   }
 }
 

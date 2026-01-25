@@ -2,8 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 
 // Check if already logged in (middleware handles redirect, but just in case)
-const locals = Astro.locals as any;
-const { user } = locals;
+const user = Astro.locals.user;
 if (user) {
   return Astro.redirect('/');
 }
@@ -201,7 +200,8 @@ if (result.error) {
         const isReturnUrlSet = returnUrl !== '/';
         
         setTimeout(() => {
-          const userRole = (result.data?.user as any)?.role;
+          // Better Auth session user object - check role for admin redirect
+          const userRole = result.data?.user?.role;
           console.log('User role:', userRole);
           console.log('Is admin:', userRole === 'ADMIN' || userRole === 'MODERATOR');
           

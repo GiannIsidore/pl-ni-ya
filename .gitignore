@@ -3,7 +3,8 @@ dist/
 
 # generated types
 .astro/
-
+*.lockfile
+*.lock
 # dependencies
 node_modules/
 

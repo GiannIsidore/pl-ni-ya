@@ -2,8 +2,7 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 
 // Get user info for welcome message - defensive approach
-const locals = Astro.locals as any;
-const user = locals?.user;
+const user = Astro.locals.user;
 const username = user?.username || user?.name || "Admin";
 
 // Default stats in case API fails

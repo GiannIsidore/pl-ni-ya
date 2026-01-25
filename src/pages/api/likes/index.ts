@@ -1,15 +1,25 @@
 import type { APIRoute } from 'astro';
 import prisma from '../../../lib/prisma';
-import { getCurrentUserId, unauthorizedResponse } from '../../../lib/auth-helpers';
+import { requireVerifiedUser, getSession } from '../../../lib/authorization';
+
+type LikeWithUser = {
+  id: number;
+  userId: string;
+  threadId: number | null;
+  commentId: number | null;
+  createdAt: Date;
+  user: {
+    id: string;
+    username: string;
+    avatar: string | null;
+  };
+};
 
 // POST /api/likes - Toggle like on a thread or comment
 export const POST: APIRoute = async ({ request }) => {
   try {
-    // Get authenticated user
-    const userId = await getCurrentUserId(request);
-    if (!userId) {
-      return unauthorizedResponse();
-    }
+    // Require verified user (checks session, DB existence, and ban status)
+    const user = await requireVerifiedUser(request);
 
     const body = await request.json();
     const { threadId, commentId } = body;
@@ -31,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Check if like already exists
     const existingLike = await prisma.like.findFirst({
       where: {
-        userId,
+        userId: user.id,
         ...(threadId ? { threadId: parseInt(threadId) } : {}),
         ...(commentId ? { commentId: parseInt(commentId) } : {}),
       },
@@ -54,7 +64,7 @@ export const POST: APIRoute = async ({ request }) => {
       // Like - create new like
       const like = await prisma.like.create({
         data: {
-          userId,
+          userId: user.id,
           ...(threadId ? { threadId: parseInt(threadId) } : {}),
           ...(commentId ? { commentId: parseInt(commentId) } : {}),
         },
@@ -79,6 +89,11 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
   } catch (error: any) {
+    // If error is already a Response (from requireVerifiedUser), return it
+    if (error instanceof Response) {
+      return error;
+    }
+    
     console.error('Like error:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to process like' }),
@@ -93,8 +108,9 @@ export const GET: APIRoute = async ({ request, url }) => {
     const threadId = url.searchParams.get('threadId');
     const commentId = url.searchParams.get('commentId');
     
-    // Get current user if authenticated (for hasLiked check)
-    const currentUserId = await getCurrentUserId(request);
+    // Get current user if authenticated (for hasLiked check) - No verification needed for read operation
+    const session = await getSession(request);
+    const currentUserId = session?.user?.id ?? null;
 
     if (!threadId && !commentId) {
       return new Response(
@@ -125,12 +141,12 @@ export const GET: APIRoute = async ({ request, url }) => {
     // Check if current user has liked
     let hasLiked = false;
     if (currentUserId) {
-      hasLiked = likes.some(like => like.userId === currentUserId);
+      hasLiked = likes.some((like: LikeWithUser) => like.userId === currentUserId);
     }
 
     // Format "who liked" display
     const likeCount = likes.length;
-    const firstThree = likes.slice(0, 3).map(like => like.user.username);
+    const firstThree = likes.slice(0, 3).map((like: LikeWithUser) => like.user.username);
     const remaining = likeCount - 3;
 
     let likedByText = '';
@@ -152,7 +168,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         likeCount,
         likedByText,
         hasLiked,
-        users: likes.map(like => like.user),
+        users: likes.map((like: LikeWithUser) => like.user),
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
