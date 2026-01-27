@@ -2,24 +2,26 @@
 import Layout from "../../layouts/Layout.astro";
 import prisma from "../../lib/prisma";
 
+// Get user info for welcome message - defensive approach
+const user = (Astro.locals as any).user;
+const username = user?.username || user?.name || "Admin";
+
 const blogs = await prisma.blog.findMany({
   orderBy: {
-    createdAt: 'desc'
+    createdAt: "desc",
   },
   include: {
-    image: true,       
+    featuredImage: true,
   },
 });
 
-
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit' 
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   });
 }
-
 
 function formatViews(views: number): string {
   if (views >= 1000000) {
@@ -32,68 +34,100 @@ function formatViews(views: number): string {
 ---
 
 <Layout title="PL-Blogs">
+  <section
+    class="text-white px-6 lg:px-12 pb-16 lg:pb-24 pt-16 lg:pt-24 bg-neutral-900"
+  >
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-12">
+        <h2
+          class="text-white mb-4"
+          style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 113.42px; line-height: 94.64px; letter-spacing: -0.04em; vertical-align: middle;"
+        >
+          {user ? `WELCOME, ${username.toUpperCase()}` : "BLOGS"}
+        </h2>
+        <p
+          class="text-white"
+          style="font-family: 'Montserrat', sans-serif; font-weight: 600; font-style: normal; font-size: 24px; line-height: 22px; letter-spacing: -0.04em; vertical-align: middle;"
+        >
+          Explore our latest blogs and updates relating to
+          <br />
+          technology, science and many more.
+        </p>
+      </div>
 
-<section class="text-white px-6 lg:px-12 pb-16 lg:pb-24 pt-16 lg:pt-24 bg-neutral-900 ">
-  <div class="max-w-7xl mx-auto">
-    <div class="mb-12">
-      <h2 class="text-white mb-4" style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 113.42px; line-height: 94.64px; letter-spacing: -0.04em; vertical-align: middle;">
-        BLOGS
-      </h2>
-      <p class="text-white" style="font-family: 'Montserrat', sans-serif; font-weight: 600; font-style: normal; font-size: 24px; line-height: 22px; letter-spacing: -0.04em; vertical-align: middle;">
-        Explore our latest blogs and updates relating to 
-        <br>
-        technology, science and many more.
-      </p>
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+      >
+        {
+          blogs.map((blog: any) => (
+            <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
+              {blog.featuredImage ? (
+                <img
+                  src={blog.featuredImage.url}
+                  alt={blog.title}
+                  class="w-full h-48 object-cover"
+                />
+              ) : (
+                <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
+                  <span class="text-neutral-500 text-sm">No Image</span>
+                </div>
+              )}
+              <div class="p-6 flex-1 flex flex-col">
+                <h3 class="text-white font-semibold text-xl mb-3">
+                  {blog.title}
+                </h3>
+                <p class="text-gray-400 text-sm mb-4 flex-1">{blog.excerpt}</p>
+                <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
+                  <span class="flex items-center gap-1">
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    {formatDate(blog.createdAt)}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                    {formatViews(blog.views)} views
+                  </span>
+                </div>
+                <a
+                  href={`/blogs/${blog.slug}`}
+                  class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium text-center"
+                >
+                  Read more
+                </a>
+              </div>
+            </article>
+          ))
+        }
+      </div>
     </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-      {blogs.map((blog) => (
-        <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-          {blog.image && blog.image.length > 0 ? (
-            <img 
-            src={blog.image[0].url} 
-              alt={blog.title}
-              class="w-full h-48 object-cover"
-            />
-          ) : (
-            <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-              <span class="text-neutral-500 text-sm">No Image</span>
-            </div>
-          )}
-          <div class="p-6 flex-1 flex flex-col">
-            <h3 class="text-white font-semibold text-xl mb-3">
-              {blog.title}
-            </h3>
-            <p class="text-gray-400 text-sm mb-4 flex-1">
-              {blog.excerpt}
-            </p>
-            <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                {formatDate(blog.createdAt)}
-              </span>
-              <span class="flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                {formatViews(blog.views)} views
-              </span>
-            </div>
-            <a 
-              href={`/blogs/${blog.slug}`}
-              class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium text-center"
-            >
-              Read more
-            </a>
-          </div>
-        </article>
-      ))}
-    </div>
-  
-  </div>
-</section>
-
+  </section>
 </Layout>

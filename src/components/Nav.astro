@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 import logo from "../assets/logo2.svg";
 
 // Get user info - defensive approach
-const user = Astro.locals.user;
+const user = (Astro.locals as any)?.user;
 
 // Debug: Log user data to see what we're getting
 console.log('Nav component - User data:', user);
@@ -13,9 +13,10 @@ console.log('Nav component - User role:', user?.role);
 const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
 ---
 
-<nav class="w-[100%] m-0 p-0 bg-neutral-900 pb-1 text-white py-4 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-lg">
-  <!-- <div class="bg-neutral-900/80 backdrop-blur-md border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"> glassmorphism effect eme if u want try dis instead of sa taas -->
-  <div class="max-w-7xl mx-auto w-full px-6 lg:px-12 flex items-center justify-between">
+<div class="fixed top-6 left-0 right-0 z-50 flex justify-center">
+  <nav class="bg-neutral-900 text-white py-3 px-6 flex items-center justify-between shadow-lg rounded-2xl border border-neutral-700 max-w-7xl mx-6">
+    <!-- <div class="bg-neutral-900/80 backdrop-blur-md border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"> glassmorphism effect eme if u want try dis instead of sa taas -->
+    <div class="flex items-center justify-between w-full gap-20">
     <div>
       <a href="/">
         <Image
@@ -23,7 +24,7 @@ const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
           alt="Project Likha Logo"
           width={100}
           height={100}
-          class="w-40 h-30"
+          class="w-32 h-8"
         />
       </a>
     </div>
@@ -113,21 +114,16 @@ const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
       <div class="flex items-center gap-3">
         <a 
           href="/login" 
-          class="text-sm font-medium text-gray-300 hover:text-white transition-colors nav-link"
+          class="bg-white border border-neutral-800 py-3 px-6 rounded-md text-sm font-medium text-neutral-800 hover:text-white hover:bg-neutral-800 transition-colors nav-link"
         >
           Sign In
-        </a>
-        <a 
-          href="/signup" 
-          class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors"
-        >
-          Sign Up
         </a>
       </div>
     )}
     </div>
-  </div>
-</nav>
+    </div>
+  </nav>
+</div>
 
 <style>
   .nav-link {

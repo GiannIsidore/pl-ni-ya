@@ -1,43 +1,33 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getDashboardStats } from "../../lib/services/dashboard";
 
 // Get user info for welcome message - defensive approach
 const user = Astro.locals.user;
 const username = user?.username || user?.name || "Admin";
 
-// Default stats in case API fails
-let stats = {
-	totalUsers: 0,
-	newUsers: 0,
-	totalBlogs: 0,
-	blogViews: 0,
-	totalThreads: 0,
-	totalComments: 0,
-	pendingModeration: 0,
-	recentActivity: [],
-	systemHealth: {
-		database: "healthy",
-		uptime: "99.9%",
-		lastBackup: "2 hours ago",
-	},
-};
-
-// Try to fetch dashboard statistics
+// Fetch dashboard statistics directly
+let stats;
 try {
-	const siteOrigin = Astro.site?.origin || "http://localhost:4322";
-	const response = await fetch(`${siteOrigin}/api/admin/stats`, {
-		headers: {
-			Cookie: Astro.request.headers.get("cookie") || "",
-		},
-	});
-
-	if (response.ok) {
-		const apiStats = await response.json();
-		stats = { ...stats, ...apiStats };
-	}
+	stats = await getDashboardStats();
 } catch (error) {
 	console.error("Failed to fetch admin stats:", error);
-	// Use default stats
+	// Default stats in case of error
+	stats = {
+		totalUsers: 0,
+		newUsers: 0,
+		totalBlogs: 0,
+		blogViews: 0,
+		totalThreads: 0,
+		totalComments: 0,
+		pendingModeration: 0,
+		recentActivity: [],
+		systemHealth: {
+			database: "error",
+			uptime: "unknown",
+			lastBackup: "unknown",
+		},
+	};
 }
 ---
 

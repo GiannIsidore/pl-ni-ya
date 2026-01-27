@@ -40,10 +40,13 @@ model Blog {
   authorId    String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  image       Image[]
+  featuredImageId Int?       @unique
+  featuredImage   Image?     @relation("BlogFeaturedImage", fields: [featuredImageId], references: [id])
+  
   category    Category?  @relation(fields: [categoryId], references: [id])
   author      User?      @relation(fields: [authorId], references: [id])
   tags        BlogTag[]
+  image       Image[]    @relation("BlogImages")
 
   @@index([categoryId])
   @@index([authorId])
@@ -55,10 +58,11 @@ model Blog {
 model Image {
   id     Int    @id @default(autoincrement())
   url    String
-  blogId Int
-  blog   Blog   @relation(fields: [blogId], references: [id])
+  blogId Int?
+  blog   Blog?  @relation("BlogImages", fields: [blogId], references: [id])
+  featuredBlog Blog? @relation("BlogFeaturedImage")
 
-  @@index([blogId], map: "Image_blogId_fkey")
+  @@index([blogId])
 }
 
 model User {

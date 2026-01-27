@@ -7,11 +7,11 @@ const blogs = await prisma.blog.findMany({
   },
   take: 5,             
   include: {
-    image: true,       
+    featuredImage: true,
   },
 })
 
-const [featuredBlog, ...smallerBlogs] = blogs
+const [featuredBlog, ...smallerBlogs] = blogs as any
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString('en-US', { 
@@ -59,9 +59,9 @@ function formatViews(views: number): string {
         {featuredBlog && (
           <article class="lg:col-span-2">
             <a href={`/blogs/${featuredBlog.slug}`} class="block group">
-              {featuredBlog.image && featuredBlog.image.length > 0 ? (
+              {featuredBlog.featuredImage ? (
                 <img 
-                  src={featuredBlog.image[0].url} 
+                  src={featuredBlog.featuredImage.url} 
                   alt={featuredBlog.title}
                   class="w-full h-64 md:h-80 lg:h-96 object-cover rounded-lg mb-4"
                 />
@@ -90,9 +90,9 @@ function formatViews(views: number): string {
           {smallerBlogs.map((blog) => (
             <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
               <a href={`/blogs/${blog.slug}`} class="flex gap-4 p-4 group">
-                {blog.image && blog.image.length > 0 ? (
+                {blog.featuredImage ? (
                   <img 
-                    src={blog.image[0].url} 
+                    src={blog.featuredImage.url} 
                     alt={blog.title}
                     class="w-24 h-24 flex-shrink-0 object-cover rounded"
                   />

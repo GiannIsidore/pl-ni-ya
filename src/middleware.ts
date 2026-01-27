@@ -1,14 +1,14 @@
 import { defineMiddleware } from "astro:middleware";
-import { getSession, verifyUser } from "./lib/authorization";
-import { hasMinimumRole } from "./types/auth";
+import { auth } from "./lib/auth";
+import { canAccessAdminPanel } from "./lib/permissions";
 
-// Routes that require authentication (session only, no DB check)
+// Routes that require authentication
 const protectedRoutes = [
   "/profile",
   "/settings",
 ];
 
-// Routes that require admin or moderator role (requires DB verification)
+// Routes that require admin or moderator role
 const adminRoutes = [
   "/admin",
 ];
@@ -21,82 +21,63 @@ const authRoutes = [
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  
+
   // Get session from Better Auth
-  const session = await getSession(context.request);
-  
-  // Store session data in locals (may be stale)
-  context.locals.session = session?.session ?? null;
-  context.locals.user = session?.user ?? null;
-  context.locals.verifiedUser = null; // Will be populated if needed
-  
-  // Check if route requires authentication
+  const session = await auth.api.getSession({
+    headers: context.request.headers,
+  });
+
+  // Store session in locals for access in pages/components
+  (context.locals as any).session = session?.session ?? null;
+  (context.locals as any).user = session?.user ?? null;
+
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
-  
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) => pathname === route);
+
+  // 1. Handle protected routes
   if (isProtectedRoute && !session) {
-    // Redirect to login with return URL
     const returnUrl = encodeURIComponent(pathname);
     return context.redirect(`/login?returnUrl=${returnUrl}`);
   }
-  
-  // Check if route requires admin access (requires DB verification)
-  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
-  
+
+  // 2. Handle admin routes
   if (isAdminRoute) {
-    if (!session || !session.user) {
-      // Redirect to login with return URL
+    if (!session) {
       const returnUrl = encodeURIComponent(pathname);
       return context.redirect(`/login?returnUrl=${returnUrl}`);
     }
-    
-    // Verify user from database and check role
-    const verifiedUser = await verifyUser(session.user.id, context.request);
-    
-    if (!verifiedUser) {
-      // User no longer exists in database
-      return context.redirect('/login?error=user-not-found');
+
+    // Check if user has admin or moderator role
+    if (!canAccessAdminPanel(session?.user as any)) {
+      return context.redirect('/?unauthorized=true');
     }
-    
-    if (verifiedUser.isBanned) {
-      // User is banned
-      return context.redirect(`/banned?reason=${encodeURIComponent(verifiedUser.banReason || 'Account suspended')}`);
-    }
-    
-    // Check if user has minimum moderator role
-    if (!hasMinimumRole(verifiedUser, 'MODERATOR')) {
-      // Insufficient permissions
-      return context.redirect('/?error=unauthorized');
-    }
-    
-    // Store verified user for use in admin pages
-    context.locals.verifiedUser = verifiedUser;
   }
-  
-  // Redirect authenticated users away from auth pages
-  const isAuthRoute = authRoutes.some((route) => pathname === route);
-  
+
+  // 3. Redirect authenticated users away from auth pages
   if (isAuthRoute && session) {
-    // Get verified user to check role
-    const verifiedUser = await verifyUser(session.user.id, context.request);
-    
-    if (verifiedUser && hasMinimumRole(verifiedUser, 'MODERATOR')) {
-      // Check if there's a return URL parameter
-      const urlParams = new URLSearchParams(context.url.search);
-      const returnUrl = urlParams.get('returnUrl');
-      
-      if (!returnUrl) {
-        // Redirect admin/moderator users to admin dashboard
-        return context.redirect("/admin");
-      }
-    }
-    
-    // Check for return URL
+    const userRole = (session.user as any)?.role;
+    const canAccessAdmin = userRole === 'ADMIN' || userRole === 'MODERATOR';
+
     const urlParams = new URLSearchParams(context.url.search);
     const returnUrl = urlParams.get('returnUrl');
-    
-    // Otherwise redirect to home or return URL
+
+    if (canAccessAdmin && !returnUrl) {
+      return context.redirect("/admin");
+    }
+
     return context.redirect(returnUrl || "/");
   }
-  
-  return next();
+
+  // 4. Handle request and set security/cache headers
+  const response = await next();
+
+  // Prevent caching for sensitive pages to avoid BFcache/stale session issues
+  if (isProtectedRoute || isAdminRoute || isAuthRoute || session) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+  }
+
+  return response;
 });

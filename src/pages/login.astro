@@ -1,45 +1,57 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 
 // Check if already logged in (middleware handles redirect, but just in case)
-const user = Astro.locals.user;
+const user = (Astro.locals as any).user;
 if (user) {
-  return Astro.redirect('/');
+  return Astro.redirect("/");
 }
 
 // Get return URL from query params
-const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
+const returnUrl = Astro.url.searchParams.get("returnUrl") || "/";
 ---
 
 <Layout title="Login - Project Likha">
-  <main class="min-h-screen bg-neutral-900 flex items-center justify-center px-4 py-12">
+  <main
+    class="min-h-screen bg-neutral-900 flex items-center justify-center px-4 py-12"
+  >
     <div class="w-full max-w-md">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-white mb-2" style="font-family: 'Bebas Neue', sans-serif;">
+        <h1
+          class="text-3xl font-bold text-white mb-2"
+          style="font-family: 'Bebas Neue', sans-serif;"
+        >
           Welcome Back
         </h1>
-        <p class="text-gray-400">
-          Sign in to continue to Project Likha
-        </p>
+        <p class="text-gray-400">Sign in to continue to Project Likha</p>
       </div>
 
       <!-- Login Form Card -->
       <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-8">
         <!-- Error Message -->
-        <div id="error-message" class="hidden mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+        <div
+          id="error-message"
+          class="hidden mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm"
+        >
         </div>
 
         <!-- Success Message -->
-        <div id="success-message" class="hidden mb-4 p-3 bg-green-900/50 border border-green-700 rounded-lg text-green-200 text-sm">
+        <div
+          id="success-message"
+          class="hidden mb-4 p-3 bg-green-900/50 border border-green-700 rounded-lg text-green-200 text-sm"
+        >
         </div>
 
         <!-- Email/Password Form -->
         <form id="login-form" class="space-y-4">
           <input type="hidden" name="returnUrl" value={returnUrl} />
-          
+
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-300 mb-2"
+            >
               Email
             </label>
             <input
@@ -53,7 +65,10 @@ const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
           </div>
 
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-300 mb-2"
+            >
               Password
             </label>
             <input
@@ -74,9 +89,24 @@ const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
           >
             <span id="btn-text">Sign In</span>
             <span id="btn-loading" class="hidden">
-              <svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                class="animate-spin h-5 w-5 mx-auto"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </span>
           </button>
@@ -88,7 +118,9 @@ const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
             <div class="w-full border-t border-neutral-600"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-4 bg-neutral-800 text-gray-400">Or continue with</span>
+            <span class="px-4 bg-neutral-800 text-gray-400"
+              >Or continue with</span
+            >
           </div>
         </div>
 
@@ -100,7 +132,9 @@ const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
             class="w-full py-3 px-4 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-3 border border-neutral-600"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              ></path>
             </svg>
             Continue with GitHub
           </button>
@@ -111,10 +145,22 @@ const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
             class="w-full py-3 px-4 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-3 border border-neutral-600"
           >
             <svg class="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              ></path>
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              ></path>
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              ></path>
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              ></path>
             </svg>
             Continue with Google
           </button>
@@ -123,7 +169,10 @@ const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
         <!-- Sign Up Link -->
         <p class="mt-6 text-center text-gray-400 text-sm">
           Don't have an account?
-          <a href={`/signup${returnUrl !== '/' ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`} class="text-blue-400 hover:text-blue-300 font-medium">
+          <a
+            href={`/signup${returnUrl !== "/" ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ""}`}
+            class="text-blue-400 hover:text-blue-300 font-medium"
+          >
             Sign up
           </a>
         </p>
@@ -133,118 +182,142 @@ const returnUrl = Astro.url.searchParams.get('returnUrl') || '/';
 </Layout>
 
 <script>
-  import { authClient } from '../lib/auth-client';
+  import { authClient } from "../lib/auth-client";
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('login-form') as HTMLFormElement;
-    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-    const btnText = document.getElementById('btn-text') as HTMLSpanElement;
-    const btnLoading = document.getElementById('btn-loading') as HTMLSpanElement;
-    const errorMessage = document.getElementById('error-message') as HTMLDivElement;
-    const successMessage = document.getElementById('success-message') as HTMLDivElement;
-    const githubBtn = document.getElementById('github-btn') as HTMLButtonElement;
-    const googleBtn = document.getElementById('google-btn') as HTMLButtonElement;
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById(
+      "login-form",
+    ) as HTMLFormElement | null;
+    if (!form) return;
+
+    const submitBtn = document.getElementById(
+      "submit-btn",
+    ) as HTMLButtonElement | null;
+    const btnText = document.getElementById(
+      "btn-text",
+    ) as HTMLSpanElement | null;
+    const btnLoading = document.getElementById(
+      "btn-loading",
+    ) as HTMLSpanElement | null;
+    const errorMessage = document.getElementById(
+      "error-message",
+    ) as HTMLDivElement | null;
+    const successMessage = document.getElementById(
+      "success-message",
+    ) as HTMLDivElement | null;
+    const githubBtn = document.getElementById(
+      "github-btn",
+    ) as HTMLButtonElement | null;
+    const googleBtn = document.getElementById(
+      "google-btn",
+    ) as HTMLButtonElement | null;
 
     const showError = (message: string) => {
-      errorMessage.textContent = message;
-      errorMessage.classList.remove('hidden');
-      successMessage.classList.add('hidden');
+      if (errorMessage) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove("hidden");
+        successMessage?.classList.add("hidden");
+      }
     };
 
     const showSuccess = (message: string) => {
-      successMessage.textContent = message;
-      successMessage.classList.remove('hidden');
-      errorMessage.classList.add('hidden');
+      if (successMessage) {
+        successMessage.textContent = message;
+        successMessage.classList.remove("hidden");
+        errorMessage?.classList.add("hidden");
+      }
     };
 
     const setLoading = (loading: boolean) => {
-      submitBtn.disabled = loading;
-      btnText.classList.toggle('hidden', loading);
-      btnLoading.classList.toggle('hidden', !loading);
+      if (submitBtn) {
+        submitBtn.disabled = loading;
+      }
+      btnText?.classList.toggle("hidden", loading);
+      btnLoading?.classList.toggle("hidden", !loading);
     };
 
     const getReturnUrl = () => {
-      const input = form.querySelector('input[name="returnUrl"]') as HTMLInputElement;
-      return input?.value || '/';
+      const input = form.querySelector(
+        'input[name="returnUrl"]',
+      ) as HTMLInputElement | null;
+      return input?.value || "/";
     };
 
     // Email/Password Login
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      const email = (document.getElementById('email') as HTMLInputElement).value;
-      const password = (document.getElementById('password') as HTMLInputElement).value;
-      
+
+      const emailInput = document.getElementById(
+        "email",
+      ) as HTMLInputElement | null;
+      const passwordInput = document.getElementById(
+        "password",
+      ) as HTMLInputElement | null;
+
+      if (!emailInput || !passwordInput) {
+        showError("Form fields not found.");
+        return;
+      }
+
+      const email = emailInput.value;
+      const password = passwordInput.value;
+
       setLoading(true);
-      errorMessage.classList.add('hidden');
+      errorMessage?.classList.add("hidden");
 
       try {
-        const result = await authClient.signIn.email({
+        const { data, error } = await authClient.signIn.email({
           email,
           password,
         });
 
-if (result.error) {
-          showError(result.error.message || 'Invalid email or password');
+        if (error) {
+          showError(error.message || "Invalid email or password");
           setLoading(false);
           return;
         }
 
-        showSuccess('Login successful! Redirecting...');
-        
-        // Debug: Log result to see what we're getting
-        console.log('Login result:', result);
-        
-        // Check if user is admin and prefer admin dashboard
+        showSuccess("Login successful! Redirecting...");
+
+        // Use the return URL from the form
         const returnUrl = getReturnUrl();
-        const isReturnUrlSet = returnUrl !== '/';
-        
-        setTimeout(() => {
-          // Better Auth session user object - check role for admin redirect
-          const userRole = result.data?.user?.role;
-          console.log('User role:', userRole);
-          console.log('Is admin:', userRole === 'ADMIN' || userRole === 'MODERATOR');
-          
-          if (userRole === 'ADMIN' || userRole === 'MODERATOR') {
-            // If admin user and no specific return URL, go to admin dashboard
-            if (!isReturnUrlSet) {
-              console.log('Redirecting admin user to dashboard...');
-              window.location.replace('/admin');
-              return;
-            }
-          }
-          
-          // Otherwise use the return URL
-          console.log('Using return URL:', returnUrl);
+        const userRole = (data?.user as any)?.role;
+        const isAdmin = userRole === "ADMIN" || userRole === "MODERATOR";
+
+        // If it's an admin user and they're just logging in normally (not coming from a specific page),
+        // take them to the admin dashboard
+        if (isAdmin && returnUrl === "/") {
+          window.location.replace("/admin");
+        } else {
           window.location.replace(returnUrl);
-        }, 500);
+        }
       } catch (error: any) {
-        showError(error.message || 'An error occurred. Please try again.');
+        showError(error.message || "An error occurred. Please try again.");
         setLoading(false);
       }
     });
 
     // GitHub OAuth
-    githubBtn.addEventListener('click', async () => {
+    githubBtn?.addEventListener("click", async () => {
       try {
         await authClient.signIn.social({
-          provider: 'github',
+          provider: "github",
           callbackURL: getReturnUrl(),
         });
       } catch (error: any) {
-        showError(error.message || 'GitHub login failed');
+        showError(error.message || "GitHub login failed");
       }
     });
 
     // Google OAuth
-    googleBtn.addEventListener('click', async () => {
+    googleBtn?.addEventListener("click", async () => {
       try {
         await authClient.signIn.social({
-          provider: 'google',
+          provider: "google",
           callbackURL: getReturnUrl(),
         });
       } catch (error: any) {
-        showError(error.message || 'Google login failed');
+        showError(error.message || "Google login failed");
       }
     });
   });

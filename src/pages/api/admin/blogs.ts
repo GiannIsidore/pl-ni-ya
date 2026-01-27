@@ -13,7 +13,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		}
 
 		const body = await request.json();
-		const { title, excerpt, content, tags, status } = body;
+		const { title, excerpt, content, tags, status, featuredImageId: rawFeaturedImageId } = body;
 
 		// Validate required fields
 		if (!title || !content) {
@@ -23,8 +23,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			);
 		}
 
+		// Ensure featuredImageId is a valid number if provided
+		const featuredImageId = rawFeaturedImageId ? parseInt(String(rawFeaturedImageId)) : undefined;
+		const isFeaturedImageIdValid = featuredImageId !== undefined && !isNaN(featuredImageId);
+
 		// Generate slug from title
-		const slug = title
+		let slug = title
 			.toLowerCase()
 			.replace(/[^a-z0-9]+/g, '-')
 			.replace(/(^-|-$)/g, '');
@@ -37,81 +41,47 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		if (existingBlog) {
 			// Add timestamp to make slug unique
 			const timestamp = Date.now();
-			const uniqueSlug = `${slug}-${timestamp}`;
+			slug = `${slug}-${timestamp}`;
+		}
 
-			// Create blog with unique slug
-			const blog = await prisma.blog.create({
-				data: {
-					title,
-					slug: uniqueSlug,
-					excerpt: excerpt || '',
-					content,
-					authorId: user.id,
-					status: (status?.toUpperCase() as any) || 'DRAFT',
-					tags: tags ? {
-						create: tags.map((tagName: string) => ({
-							tag: {
-								connectOrCreate: {
-									where: { name: tagName },
-									create: {
-										name: tagName,
-										slug: tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-									}
-								}
-							}
-						}))
-					} : undefined
-				},
-				include: {
-					tags: {
-						include: {
-							tag: true
-						}
-					},
-					author: {
-						select: {
-							id: true,
-							username: true,
-							name: true,
-							avatar: true
+		// Prepare tags data
+		const tagsData = tags && Array.isArray(tags) ? {
+			create: tags.map((tagName: string) => ({
+				tag: {
+					connectOrCreate: {
+						where: { name: tagName },
+						create: {
+							name: tagName,
+							slug: tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 						}
 					}
 				}
-			});
+			}))
+		} : undefined;
 
-			return new Response(
-				JSON.stringify({
-					message: 'Blog created successfully!',
-					blog
-				}),
-				{ status: 201, headers: { 'Content-Type': 'application/json' } }
-			);
-		}
-
-		// Create blog with original slug
+		// Create blog
 		const blog = await prisma.blog.create({
 			data: {
 				title,
 				slug,
 				excerpt: excerpt || '',
 				content,
-				authorId: user.id,
+				author: {
+					connect: { id: user.id }
+				},
 				status: (status?.toUpperCase() as any) || 'DRAFT',
-				tags: tags ? {
-					create: tags.map((tagName: string) => ({
-						tag: {
-							connectOrCreate: {
-								where: { name: tagName },
-								create: {
-									name: tagName,
-									slug: tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-								}
-							}
-						}
-					}))
+				tags: tagsData,
+				// Set the featured image
+				featuredImage: isFeaturedImageIdValid ? {
+					connect: { id: featuredImageId }
+				} : undefined,
+				// Also add it to the general image collection for this blog
+				image: isFeaturedImageIdValid ? {
+					connect: [{ id: featuredImageId }]
 				} : undefined
 			},
 			include: {
+				featuredImage: true,
 				tags: {
 					include: {
 						tag: true
@@ -136,12 +106,22 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			{ status: 201, headers: { 'Content-Type': 'application/json' } }
 		);
 
-	} catch (error) {
+	} catch (error: any) {
 		console.error('Error creating blog:', error);
+
+		// Map specific Prisma errors to user-friendly messages
+		let errorMessage = 'An error occurred while creating the blog.';
+		if (error.code === 'P2002') {
+			errorMessage = 'A blog with this title or slug already exists.';
+		} else if (error.code === 'P2025') {
+			errorMessage = 'One or more referenced records (like the image) were not found.';
+		}
+
 		return new Response(
 			JSON.stringify({
 				message: 'Internal server error',
-				error: error instanceof Error ? error.message : 'Unknown error'
+				error: errorMessage,
+				details: error.message
 			}),
 			{ status: 500, headers: { 'Content-Type': 'application/json' } }
 		);
@@ -165,6 +145,7 @@ export const GET: APIRoute = async ({ locals }) => {
 				createdAt: 'desc'
 			},
 			include: {
+				featuredImage: true,
 				tags: {
 					include: {
 						tag: true

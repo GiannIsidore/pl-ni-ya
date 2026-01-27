@@ -33,8 +33,7 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day - update session if older than this
     cookieCache: {
-      enabled: true,
-      maxAge: 60 * 5, // 5 minutes
+      enabled: false, // Disable cache to ensure fresh session checks
     },
   },
 
@@ -42,6 +41,7 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "better-auth",
     useSecureCookies: false, // Set to true in production with HTTPS
+    generateId: () => Math.random().toString(36).substring(2, 11), // Custom ID generator if needed
   },
 
   user: {
