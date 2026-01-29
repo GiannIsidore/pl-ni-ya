@@ -18,71 +18,31 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 <AdminLayout title="Manage Categories">
 	<div class="space-y-6">
 		<!-- Header -->
-		<div
-			class="flex flex-col md:flex-row md:items-center justify-between gap-4"
-		>
+		<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
 			<div>
-				<h1
-					class="text-4xl font-normal text-white tracking-tight"
-					style="font-family: 'Bebas Neue', sans-serif;"
-				>
-					Categories
-				</h1>
-				<p
-					class="text-neutral-400 text-sm mt-1"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
-					Organize your content with categories
-				</p>
+				<h1 class="text-2xl font-semibold text-gray-900">Categories</h1>
+				<p class="text-gray-500 text-sm mt-1">Organize your content with categories</p>
 			</div>
 			<button
 				id="create-category-btn"
-				class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-600/25 group"
+				class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
 			>
-				<svg
-					class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M12 4v16m8-8H4"></path>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
 				</svg>
-				<span style="font-family: 'Schibsted Grotesk', sans-serif;"
-					>Add Category</span
-				>
+				<span>Add Category</span>
 			</button>
 		</div>
 
 		<!-- Search & Stats -->
-		<div
-			class="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 flex flex-col lg:flex-row gap-4 items-center justify-between shadow-lg"
-		>
+		<div class="bg-white border border-gray-300 rounded-lg p-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
 			<!-- Search -->
-			<form
-				class="flex flex-1 w-full lg:w-auto flex-col sm:flex-row gap-3 items-center"
-				method="get"
-			>
+			<form class="flex flex-1 w-full lg:w-auto flex-col sm:flex-row gap-3 items-center" method="get">
 				<div class="flex w-full max-w-md gap-2">
-					<div class="relative flex-1 group">
-						<div
-							class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-						>
-							<svg
-								class="h-4 w-4 text-neutral-500 group-focus-within:text-blue-500 transition-colors"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-								></path>
+					<div class="relative flex-1">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
 							</svg>
 						</div>
 						<input
@@ -90,12 +50,12 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 							name="search"
 							value={search}
 							placeholder="Search categories..."
-							class="block w-full pl-10 pr-3 h-10 bg-neutral-800 border border-neutral-700 rounded-xl text-white text-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+							class="block w-full pl-10 pr-3 h-10 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
 						/>
 					</div>
 					<button
 						type="submit"
-						class="px-4 h-10 bg-neutral-700 hover:bg-neutral-600 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all border border-neutral-600"
+						class="px-4 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200"
 					>
 						Search
 					</button>
@@ -104,8 +64,8 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
 			<!-- Stats -->
 			<div class="flex items-center gap-4 text-sm">
-				<div class="text-neutral-400">
-					<span class="text-white font-semibold">{total}</span> total categories
+				<div class="text-gray-500">
+					<span class="text-gray-900 font-semibold">{total}</span> total categories
 				</div>
 			</div>
 		</div>
@@ -113,14 +73,9 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 		<!-- Categories Grid -->
 		{
 			categories.length === 0 ? (
-				<div class="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-16 text-center">
-					<div class="w-20 h-20 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-6">
-						<svg
-							class="w-10 h-10 text-neutral-600"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
+				<div class="bg-white border border-gray-300 rounded-lg p-12 text-center">
+					<div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+						<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -129,34 +84,27 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 							/>
 						</svg>
 					</div>
-					<h3 class="text-xl font-bold text-white mb-2">
-						No categories found
-					</h3>
-					<p class="text-neutral-400 mb-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-2">No categories found</h3>
+					<p class="text-gray-500 mb-4">
 						{search ? "Try adjusting your search terms." : "Get started by creating your first category."}
 					</p>
 					<button
 						id="create-category-btn-empty"
-						class="inline-flex items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors"
+						class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
 					>
 						Create Category
 					</button>
 				</div>
 			) : (
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 					{categories.map((category) => (
 						<div
-							class="group bg-neutral-900 rounded-2xl p-6 border border-neutral-800 hover:border-blue-500/50 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/5"
+							class="bg-white rounded-lg p-5 border border-gray-300 hover:border-gray-400 transition-colors"
 							data-category-id={category.id}
 						>
 							<div class="flex items-start justify-between mb-4">
-								<div class="w-12 h-12 bg-blue-600/10 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-									<svg
-										class="w-6 h-6 text-blue-500 group-hover:text-white transition-colors"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
+								<div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+									<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
 											stroke-linecap="round"
 											stroke-linejoin="round"
@@ -167,7 +115,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 								</div>
 								<div class="flex items-center gap-1">
 									<button
-										class="edit-btn p-2 text-neutral-500 hover:text-blue-400 hover:bg-blue-600/10 rounded-lg transition-all"
+										class="edit-btn p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 										data-id={category.id}
 										data-name={category.name}
 										data-slug={category.slug}
@@ -179,7 +127,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 										</svg>
 									</button>
 									<button
-										class="delete-btn p-2 text-neutral-500 hover:text-red-400 hover:bg-red-600/10 rounded-lg transition-all"
+										class="delete-btn p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
 										data-id={category.id}
 										data-name={category.name}
 										data-count={category.blogCount}
@@ -192,29 +140,20 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 								</div>
 							</div>
 
-							<h3
-								class="text-xl font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors"
-								style="font-family: 'Schibsted Grotesk', sans-serif;"
-							>
-								{category.name}
-							</h3>
+							<h3 class="text-lg font-semibold text-gray-900 mb-1">{category.name}</h3>
 
 							{category.description && (
-								<p class="text-neutral-500 text-sm mb-4 line-clamp-2">
-									{category.description}
-								</p>
+								<p class="text-gray-500 text-sm mb-3 line-clamp-2">{category.description}</p>
 							)}
 
-							<div class="flex items-center justify-between pt-4 border-t border-neutral-800">
+							<div class="flex items-center justify-between pt-3 border-t border-gray-100">
 								<div class="flex items-center gap-2 text-sm">
-									<span class="text-neutral-500">Slug:</span>
-									<code class="text-neutral-400 bg-neutral-800 px-2 py-0.5 rounded text-xs">
-										/{category.slug}
-									</code>
+									<span class="text-gray-500">Slug:</span>
+									<code class="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs">/{category.slug}</code>
 								</div>
 								<div class="flex items-center gap-1 text-sm">
-									<span class="text-blue-400 font-semibold">{category.blogCount}</span>
-									<span class="text-neutral-500">posts</span>
+									<span class="text-blue-600 font-semibold">{category.blogCount}</span>
+									<span class="text-gray-500">posts</span>
 								</div>
 							</div>
 						</div>
@@ -226,8 +165,8 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 		<!-- Pagination -->
 		{
 			totalPages > 1 && (
-				<div class="flex items-center justify-between pt-6 border-t border-neutral-800">
-					<div class="text-sm text-neutral-500">
+				<div class="flex items-center justify-between pt-4 border-t border-gray-200">
+					<div class="text-sm text-gray-500">
 						Showing {(page - 1) * limit + 1} - {Math.min(page * limit, total)} of{" "}
 						{total} categories
 					</div>
@@ -235,19 +174,19 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 						{page > 1 && (
 							<a
 								href={`?page=${page - 1}&search=${search}`}
-								class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors text-sm font-medium"
+								class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
 							>
 								Previous
 							</a>
-							)}
+						)}
 						<div class="flex items-center gap-1">
 							{pages.map((p) => (
 								<a
 									href={`?page=${p}&search=${search}`}
-									class={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-medium transition-colors ${
+									class={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
 										p === page
 											? "bg-blue-600 text-white"
-											: "bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white"
+											: "bg-gray-100 text-gray-700 hover:bg-gray-200"
 									}`}
 								>
 									{p}
@@ -257,11 +196,11 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 						{page < totalPages && (
 							<a
 								href={`?page=${page + 1}&search=${search}`}
-								class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors text-sm font-medium"
+								class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
 							>
 								Next
 							</a>
-							)}
+						)}
 					</div>
 				</div>
 			)
@@ -271,31 +210,21 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 	<!-- Create/Edit Modal -->
 	<div
 		id="category-modal"
-		class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+		class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
 	>
-		<div class="bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl w-full max-w-md overflow-hidden">
-			<div class="p-6 border-b border-neutral-800">
-				<h2
-					id="modal-title"
-					class="text-2xl font-normal text-white tracking-tight"
-					style="font-family: 'Bebas Neue', sans-serif;"
-				>
-					Create Category
-				</h2>
-				<p class="text-neutral-400 text-sm mt-1">
+				<div class="bg-white rounded-lg border border-gray-300 shadow-lg w-full max-w-md overflow-hidden">
+			<div class="p-4 border-b border-gray-200">
+				<h2 id="modal-title" class="text-lg font-semibold text-gray-900">Create Category</h2>
+				<p class="text-gray-500 text-sm mt-1">
 					<span id="modal-subtitle">Add a new category to organize your content</span>
 				</p>
 			</div>
 
-			<form id="category-form" class="p-6 space-y-4">
+			<form id="category-form" class="p-4 space-y-4">
 				<input type="hidden" id="category-id" value="" />
 
 				<div>
-					<label
-						for="category-name"
-						class="block text-white font-semibold mb-2 text-sm"
-						style="font-family: 'Schibsted Grotesk', sans-serif;"
-					>
+					<label for="category-name" class="block text-gray-700 font-medium mb-1 text-sm">
 						Category Name <span class="text-red-500">*</span>
 					</label>
 					<input
@@ -304,52 +233,41 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 						name="name"
 						required
 						placeholder="e.g., Technology, Lifestyle, News"
-						class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-						style="font-family: 'Schibsted Grotesk', sans-serif;"
+						class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
 					/>
 				</div>
 
 				<div>
-					<label
-						for="category-slug"
-						class="block text-white font-semibold mb-2 text-sm"
-						style="font-family: 'Schibsted Grotesk', sans-serif;"
-					>
-						Slug <span class="text-neutral-500 font-normal">(auto-generated)</span>
+					<label for="category-slug" class="block text-gray-700 font-medium mb-1 text-sm">
+						Slug <span class="text-gray-500 font-normal">(auto-generated)</span>
 					</label>
 					<input
 						type="text"
 						id="category-slug"
 						name="slug"
 						placeholder="technology"
-						class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-						style="font-family: 'Schibsted Grotesk', sans-serif;"
+						class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
 					/>
-					<p class="text-neutral-500 text-xs mt-1">
+					<p class="text-gray-500 text-xs mt-1">
 						Used in URLs: /blogs?category=<span id="slug-preview">technology</span>
 					</p>
 				</div>
 
 				<div>
-					<label
-						for="category-description"
-						class="block text-white font-semibold mb-2 text-sm"
-						style="font-family: 'Schibsted Grotesk', sans-serif;"
-					>
-						Description <span class="text-neutral-500 font-normal">(optional)</span>
+					<label for="category-description" class="block text-gray-700 font-medium mb-1 text-sm">
+						Description <span class="text-gray-500 font-normal">(optional)</span>
 					</label>
 					<textarea
 						id="category-description"
 						name="description"
 						rows="3"
 						placeholder="Brief description of this category..."
-						class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
-						style="font-family: 'Schibsted Grotesk', sans-serif;"
+						class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
 					></textarea>
 				</div>
 
-				<div id="form-error" class="hidden p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-					<p class="text-red-400 text-sm flex items-center gap-2">
+				<div id="form-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg">
+					<p class="text-red-600 text-sm flex items-center gap-2">
 						<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
@@ -361,14 +279,14 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 					<button
 						type="button"
 						id="cancel-btn"
-						class="flex-1 px-4 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors font-medium"
+						class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
 						id="submit-btn"
-						class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium flex items-center justify-center gap-2"
+						class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
 					>
 						<span id="submit-text">Create</span>
 						<svg id="submit-spinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -384,30 +302,30 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 	<!-- Delete Confirmation Modal -->
 	<div
 		id="delete-modal"
-		class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+		class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4"
 	>
-		<div class="bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl w-full max-w-sm overflow-hidden">
+				<div class="bg-white rounded-lg border border-gray-300 shadow-lg w-full max-w-sm overflow-hidden">
 			<div class="p-6 text-center">
-				<div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-					<svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
+					<svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
 					</svg>
 				</div>
-				<h3 class="text-xl font-semibold text-white mb-2">Delete Category?</h3>
-				<p class="text-neutral-400 text-sm mb-6">
-					Are you sure you want to delete <strong id="delete-category-name" class="text-white"></strong>?
-					<span id="delete-warning" class="block mt-2 text-red-400"></span>
+				<h3 class="text-lg font-semibold text-gray-900 mb-2">Delete Category?</h3>
+				<p class="text-gray-500 text-sm mb-4">
+					Are you sure you want to delete <strong id="delete-category-name" class="text-gray-900"></strong>?
+					<span id="delete-warning" class="block mt-2 text-red-600 text-sm"></span>
 				</p>
 				<div class="flex items-center gap-3">
 					<button
 						id="cancel-delete-btn"
-						class="flex-1 px-4 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl transition-colors font-medium"
+						class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium"
 					>
 						Cancel
 					</button>
 					<button
 						id="confirm-delete-btn"
-						class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium flex items-center justify-center gap-2"
+						class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
 					>
 						<span>Delete</span>
 						<svg id="delete-spinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -650,7 +568,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 					submitBtn.disabled = false;
 					submitSpinner.classList.add('hidden');
 				}
-			} catch (error) {
+			} catch (err) {
 				showError('An error occurred while saving the category');
 				submitBtn.disabled = false;
 				submitSpinner.classList.add('hidden');
