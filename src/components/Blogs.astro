@@ -7,7 +7,8 @@ const blogs = await prisma.blog.findMany({
   },
   take: 5,             
   include: {
-    featuredImage: true,
+    image_blog_featuredImageIdToimage: true,
+    category: true,
   },
 })
 
@@ -21,7 +22,6 @@ function formatDate(date: Date): string {
   });
 }
 
-
 function formatViews(views: number): string {
   if (views >= 1000000) {
     return `${(views / 1000000).toFixed(1)}M`;
@@ -30,11 +30,16 @@ function formatViews(views: number): string {
   }
   return views.toString();
 }
+
+function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength).trim() + '...';
+}
 ---
 
-<section class="text-white px-6 lg:px-12 pb-16 lg:pb-24 pt-16 lg:pt-24 bg-neutral-900">
+<section class="text-white px-6 lg:px-12 pb-16 lg:pb-24 pt-16 lg:pt-24 mt-8 lg:mt-12 bg-neutral-900">
   <div class="max-w-7xl mx-auto">
-    <div class="mb-12">
+    <div class="mb-12 scroll-fade-in">
       <h2 class="text-white mb-4" style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 113.42px; line-height: 94.64px; letter-spacing: -0.04em; vertical-align: middle;">
         BLOGS
       </h2>
@@ -46,7 +51,7 @@ function formatViews(views: number): string {
     </div>
     
     {blogs.length === 0 ? (
-      <div class="flex flex-col items-center justify-center py-20">
+      <div class="flex flex-col items-center justify-center py-20 scroll-fade-in">
         <svg class="w-24 h-24 text-neutral-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
@@ -57,58 +62,101 @@ function formatViews(views: number): string {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <!-- Featured Blog (Left - Large) -->
         {featuredBlog && (
-          <article class="lg:col-span-2">
+          <article class="lg:col-span-2 scroll-fade-in">
             <a href={`/blogs/${featuredBlog.slug}`} class="block group">
-              {featuredBlog.featuredImage ? (
-                <img 
-                  src={featuredBlog.featuredImage.url} 
-                  alt={featuredBlog.title}
-                  class="w-full h-64 md:h-80 lg:h-96 object-cover rounded-lg mb-4"
-                />
-              ) : (
-                <div class="w-full h-64 md:h-80 lg:h-96 bg-neutral-700 flex items-center justify-center rounded-lg mb-4">
-                  <span class="text-neutral-500 text-sm">No Image</span>
+              <div class="bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700 hover:border-neutral-600 transition-all duration-300 hover:shadow-lg hover:shadow-black/20 h-full">
+                {/* Image */}
+                <div class="aspect-[16/9] overflow-hidden">
+                  {featuredBlog.image_blog_featuredImageIdToimage ? (
+                    <img
+                      src={featuredBlog.image_blog_featuredImageIdToimage.url}
+                      alt={featuredBlog.title}
+                      loading="lazy"
+                      decoding="async"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div class="w-full h-full bg-neutral-700 flex items-center justify-center">
+                      <span class="text-neutral-500 text-sm">No Image</span>
+                    </div>
+                  )}
                 </div>
-              )}
-              <div class="mb-3">
-                <span class="inline-block px-3 py-1 bg-neutral-800 text-white text-xs font-semibold rounded border border-neutral-700">
-                  General News
-                </span>
+                
+                {/* Content */}
+                <div class="p-6">
+                  <div class="mb-3">
+                    <span class="inline-block px-3 py-1 bg-neutral-900 text-white text-xs font-semibold rounded border border-neutral-700">
+                      Featured
+                    </span>
+                  </div>
+                  <h3 class="text-white font-semibold text-2xl md:text-3xl mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">
+                    {featuredBlog.title}
+                  </h3>
+                  <p class="text-gray-400 text-base mb-4 line-clamp-3">
+                    {featuredBlog.excerpt || 'No description available...'}
+                  </p>
+                  
+                  {/* Meta */}
+                  <div class="flex items-center justify-between text-sm text-gray-500">
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                      {formatDate(featuredBlog.createdAt)}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                      {formatViews(featuredBlog.views || 0)} views
+                    </span>
+                  </div>
+                  
+                  {/* Read more */}
+                  <div class="mt-4 pt-4 border-t border-neutral-700">
+                    <span class="inline-flex items-center text-sm text-white font-medium group-hover:text-blue-400 transition-colors">
+                      Read more
+                      <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
               </div>
-              <h3 class="text-white font-semibold text-2xl md:text-3xl lg:text-4xl mb-3 group-hover:text-blue-400 transition-colors">
-                {featuredBlog.title}
-              </h3>
-              <p class="text-gray-400 text-sm mb-4">
-                {formatDate(featuredBlog.createdAt)}
-              </p>
             </a>
           </article>
         )}
 
         <!-- Smaller Blogs (Right - Vertical Stack) -->
         <div class="flex flex-col gap-4 lg:col-span-1">
-          {smallerBlogs.map((blog) => (
-            <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
-              <a href={`/blogs/${blog.slug}`} class="flex gap-4 p-4 group">
-                {blog.featuredImage ? (
-                  <img 
-                    src={blog.featuredImage.url} 
+          {smallerBlogs.slice(0, 4).map((blog: any, index: number) => (
+            <article class="scroll-fade-in" style={`transition-delay: ${(index + 1) * 100}ms;`}>
+              <a href={`/blogs/${blog.slug}`} class="flex gap-4 p-4 bg-neutral-800 rounded-xl border border-neutral-700 hover:border-neutral-600 transition-all group">
+                {blog.image_blog_featuredImageIdToimage ? (
+                  <img
+                    src={blog.image_blog_featuredImageIdToimage.url}
                     alt={blog.title}
-                    class="w-24 h-24 flex-shrink-0 object-cover rounded"
+                    loading="lazy"
+                    decoding="async"
+                    class="w-24 h-24 flex-shrink-0 object-cover rounded-lg group-hover:scale-105 transition-transform"
                   />
                 ) : (
-                  <div class="w-24 h-24 flex-shrink-0 bg-neutral-700 flex items-center justify-center rounded">
+                  <div class="w-24 h-24 flex-shrink-0 bg-neutral-700 flex items-center justify-center rounded-lg">
                     <span class="text-neutral-500 text-xs">No Image</span>
                   </div>
                 )}
                 <div class="flex-1 flex flex-col min-w-0">
                   <span class="inline-block px-2 py-0.5 bg-neutral-900 text-white text-xs font-semibold rounded border border-neutral-700 mb-2 w-fit">
-                    General News
+                    {blog.category?.name || 'General News'}
                   </span>
                   <h4 class="text-white font-semibold text-sm mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
                     {blog.title}
                   </h4>
-                  <p class="text-gray-400 text-xs">
+                  <p class="text-gray-400 text-xs mb-2">
+                    {truncateText(blog.excerpt || '', 60)}
+                  </p>
+                  <p class="text-gray-500 text-xs">
                     {formatDate(blog.createdAt)}
                   </p>
                 </div>
@@ -118,5 +166,19 @@ function formatViews(views: number): string {
         </div>
       </div>
     )}
+    
+    {/* View All Button */}
+    <div class="mt-12 text-center scroll-fade-in">
+      <a 
+        href="/blogs" 
+        class="inline-flex items-center gap-2 px-8 py-4 bg-white text-neutral-900 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
+        style="font-family: 'Montserrat', sans-serif;"
+      >
+        View All Blogs
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
   </div>
 </section>

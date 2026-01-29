@@ -6,18 +6,19 @@ import { cn } from "../lib/utils";
 
 <section
   class={cn(
-    "w-full h-full absolute inset-0",
+    "w-full min-h-[calc(100vh-80px)]",
     "[background-size:20px_20px]",
     "[background-image:radial-gradient(#d4d4d4_1px,transparent_1px)]",
     "dark:[background-image:radial-gradient(#404040_1px,transparent_1px)]",
     "text-white px-6 lg:px-12 pt-16 lg:pt-24 relative",
     "bg-neutral-900",
+    "flex items-end",
   )}
 >
   <div
-    class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12"
+    class="max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-end justify-between gap-12 pb-0"
   >
-    <div class="flex-1 space-y-6">
+    <div class="flex-1 space-y-6 pb-12 lg:pb-24">
       <h1
         style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 124.64px; line-height: 104px; letter-spacing: -0.04em; vertical-align: middle; width: 548px; height: 204px; top: 308px; left: 182px; opacity: 1;"
       >
@@ -33,13 +34,13 @@ import { cn } from "../lib/utils";
         Explore now
       </a>
     </div>
-    <div class="flex-1 flex justify-center lg:justify-end">
+    <div class="flex-1 flex justify-center lg:justify-end items-end">
       <Image
         src={char}
         alt="Character illustration"
         width={524}
         height={684}
-        style="width: 524px; height: 684px;"
+        class="w-[524px] h-auto object-contain"
       />
     </div>
   </div>

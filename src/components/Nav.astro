@@ -13,10 +13,9 @@ console.log('Nav component - User role:', user?.role);
 const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
 ---
 
-<div class="fixed top-6 left-0 right-0 z-50 flex justify-center">
-  <nav class="bg-neutral-900 text-white py-3 px-6 flex items-center justify-between shadow-lg rounded-2xl border border-neutral-700 max-w-7xl mx-6">
-    <!-- <div class="bg-neutral-900/80 backdrop-blur-md border-b border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"> glassmorphism effect eme if u want try dis instead of sa taas -->
-    <div class="flex items-center justify-between w-full gap-20">
+<div class="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 sm:px-6 lg:px-8">
+  <nav class="bg-neutral-900 text-white py-4 px-6 lg:px-8 flex items-center justify-between shadow-lg rounded-2xl border border-neutral-700 w-full max-w-7xl">
+    <div class="flex items-center justify-between w-full gap-8 lg:gap-16">
     <div>
       <a href="/">
         <Image
@@ -29,14 +28,14 @@ const isAdmin = user?.role === 'ADMIN' || user?.role === 'MODERATOR';
       </a>
     </div>
     
-    <div class="flex items-center gap-8">
+    <div class="flex items-center gap-4 lg:gap-8">
     <!-- Navigation Links -->
-    <div class="hidden md:flex items-center gap-8">
-      <a href="/blogs" class="hover:text-gray-300 transition-colors nav-link">Blogs</a>
-      <a href="/forums" class="hover:text-gray-300 transition-colors nav-link">Forums</a>
-      <a href="/about-us" class="hover:text-gray-300 transition-colors nav-link">About us</a>
-      <a href="/ideas" class="hover:text-gray-300 transition-colors nav-link">Ideas</a>
-      <a href="/projects" class="hover:text-gray-300 transition-colors nav-link">Projects</a>
+    <div class="hidden md:flex items-center gap-6 lg:gap-8">
+      <a href="/blogs" class="hover:text-gray-300 transition-colors nav-link whitespace-nowrap">Blogs</a>
+      <a href="/forums" class="hover:text-gray-300 transition-colors nav-link whitespace-nowrap">Forums</a>
+      <a href="/about-us" class="hover:text-gray-300 transition-colors nav-link whitespace-nowrap">About us</a>
+      <a href="/ideas" class="hover:text-gray-300 transition-colors nav-link whitespace-nowrap">Ideas</a>
+      <a href="/projects" class="hover:text-gray-300 transition-colors nav-link whitespace-nowrap">Projects</a>
         {isAdmin && (
         <a href="/admin" class="hover:text-blue-300 transition-colors nav-link text-blue-400 font-semibold">
           <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

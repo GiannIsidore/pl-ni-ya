@@ -76,9 +76,9 @@ export const PATCH: APIRoute = async ({ request, params, locals }) => {
         if (rawFeaturedImageId !== undefined) {
             const featuredImageId = rawFeaturedImageId ? parseInt(String(rawFeaturedImageId)) : null;
              if (featuredImageId) {
-                data.featuredImage = { connect: { id: featuredImageId } };
+                data.image_blog_featuredImageIdToimage = { connect: { id: featuredImageId } };
             } else {
-                data.featuredImage = { disconnect: true };
+                data.image_blog_featuredImageIdToimage = { disconnect: true };
             }
         }
 

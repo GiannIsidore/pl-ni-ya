@@ -8,7 +8,7 @@ const blog = await prisma.blog.findUnique({
     slug: slug,
   },
   include: {
-    featuredImage: true,
+    image_blog_featuredImageIdToimage: true,
   },
 });
 const blogAny = blog as any;
@@ -43,8 +43,8 @@ function formatViews(views: number): string {
     <!-- Background Image with Parallax and Lower Opacity -->
     <div
       class="absolute inset-0 bg-cover bg-center bg-fixed parallax-banner transition-opacity duration-1000"
-      style={blogAny.featuredImage
-        ? `background-image: url('${blogAny.featuredImage.url}'); opacity: 0.5;`
+      style={blogAny.image_blog_featuredImageIdToimage
+        ? `background-image: url('${blogAny.image_blog_featuredImageIdToimage.url}'); opacity: 0.5;`
         : `opacity: 0;`}
     >
     </div>

@@ -489,7 +489,8 @@ const canManageRoles = isAdmin;
 			if (
 				href &&
 				(href === currentPath ||
-					(href !== "/admin" && currentPath.startsWith(href)))
+					(href !== "/admin" && currentPath.startsWith(href)) ||
+					(href === "/admin/categories" && currentPath === "/admin/categories"))
 			) {
 				const iconContainer = item.querySelector("div");
 				item.classList.remove("text-neutral-400");

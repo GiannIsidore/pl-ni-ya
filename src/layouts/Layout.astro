@@ -40,7 +40,9 @@ import { cn } from "../lib/utils";
 		<main>
 			<slot />
 		</main>
-		<Footer />
+		<div class="relative z-10">
+			<Footer />
+		</div>
 	</body>
 </html>
 
@@ -63,4 +65,49 @@ import { cn } from "../lib/utils";
 	main {
 		flex: 1;
 	}
+
+	/* Scroll-triggered fade-in animation */
+	.scroll-fade-in {
+		opacity: 0;
+		transform: translateY(30px);
+		transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+	}
+
+	.scroll-fade-in.visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	/* Stagger delay utilities */
+	.scroll-fade-in[data-delay="100"] { transition-delay: 100ms; }
+	.scroll-fade-in[data-delay="200"] { transition-delay: 200ms; }
+	.scroll-fade-in[data-delay="300"] { transition-delay: 300ms; }
+	.scroll-fade-in[data-delay="400"] { transition-delay: 400ms; }
+	.scroll-fade-in[data-delay="500"] { transition-delay: 500ms; }
 </style>
+
+<script>
+	// Intersection Observer for scroll animations
+	document.addEventListener('DOMContentLoaded', () => {
+		const observerOptions = {
+			root: null,
+			rootMargin: '0px 0px -50px 0px',
+			threshold: 0.1
+		};
+
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('visible');
+					// Optionally unobserve after animation
+					// observer.unobserve(entry.target);
+				}
+			});
+		}, observerOptions);
+
+		// Observe all elements with scroll-fade-in class
+		document.querySelectorAll('.scroll-fade-in').forEach(el => {
+			observer.observe(el);
+		});
+	});
+</script>

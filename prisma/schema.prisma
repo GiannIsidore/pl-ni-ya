@@ -7,106 +7,7 @@ datasource db {
   provider = "mysql"
 }
 
-enum Role {
-  USER
-  MODERATOR
-  ADMIN
-}
-
-enum BlogStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-}
-
-enum ThreadStatus {
-  OPEN
-  CLOSED
-  RESOLVED
-}
-
-model Blog {
-  id          Int        @id @default(autoincrement())
-  slug        String     @unique
-  title       String
-  excerpt     String     @db.Text
-  content     String     @db.LongText
-  views       Int        @default(0)
-  status      BlogStatus @default(DRAFT)
-  isFeatured  Boolean    @default(false)
-  publishedAt DateTime?
-  readTime    Int?       // Estimated reading time in minutes
-  categoryId  Int?
-  authorId    String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  featuredImageId Int?       @unique
-  featuredImage   Image?     @relation("BlogFeaturedImage", fields: [featuredImageId], references: [id])
-  
-  category    Category?  @relation(fields: [categoryId], references: [id])
-  author      User?      @relation(fields: [authorId], references: [id])
-  tags        BlogTag[]
-  image       Image[]    @relation("BlogImages")
-
-  @@index([categoryId])
-  @@index([authorId])
-  @@index([status])
-  @@index([publishedAt])
-  @@index([isFeatured])
-}
-
-model Image {
-  id     Int    @id @default(autoincrement())
-  url    String
-  blogId Int?
-  blog   Blog?  @relation("BlogImages", fields: [blogId], references: [id])
-  featuredBlog Blog? @relation("BlogFeaturedImage")
-
-  @@index([blogId])
-}
-
-model User {
-  id            String    @id
-  username      String    @unique
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  name          String?
-  avatar        String?   @db.Text
-  role          Role      @default(USER)
-  isBanned      Boolean   @default(false)
-  bannedAt      DateTime?
-  bannedBy      String?
-  banReason     String?   @db.Text
-  bannedUntil   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  auditLogs     AuditLog[]
-  blogs         Blog[]
-  comments      Comment[]
-  likes         Like[]
-  sessions      Session[]
-  threads       Thread[]
-
-  @@index([role])
-  @@index([isBanned])
-}
-
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  ipAddress String?
-  userAgent String?
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model Account {
+model account {
   id                    String    @id
   accountId             String
   providerId            String
@@ -119,142 +20,239 @@ model Account {
   scope                 String?
   password              String?
   createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt             DateTime
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Account_userId_fkey")
 
-  @@unique([providerId, accountId])
-  @@index([userId])
+  @@unique([providerId, accountId], map: "Account_providerId_accountId_key")
+  @@index([userId], map: "Account_userId_idx")
 }
 
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model auditlog {
+  id          Int      @id @default(autoincrement())
+  action      String
+  targetType  String
+  targetId    String
+  performedBy String
+  details     String?  @db.Text
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+  user        user     @relation(fields: [performedBy], references: [id], map: "AuditLog_performedBy_fkey")
 
-  @@unique([identifier, value])
+  @@index([createdAt], map: "AuditLog_createdAt_idx")
+  @@index([performedBy], map: "AuditLog_performedBy_idx")
+  @@index([targetType, targetId], map: "AuditLog_targetType_targetId_idx")
 }
 
-model Forum {
+model blog {
+  id                                Int         @id @default(autoincrement())
+  slug                              String      @unique(map: "Blog_slug_key")
+  title                             String
+  excerpt                           String      @db.Text
+  content                           String      @db.LongText
+  views                             Int         @default(0)
+  status                            blog_status @default(DRAFT)
+  isFeatured                        Boolean     @default(false)
+  publishedAt                       DateTime?
+  readTime                          Int?
+  categoryId                        Int?
+  authorId                          String?
+  createdAt                         DateTime    @default(now())
+  updatedAt                         DateTime
+  featuredImageId                   Int?        @unique(map: "Blog_featuredImageId_key")
+  user                              user?       @relation(fields: [authorId], references: [id], map: "Blog_authorId_fkey")
+  category                          category?   @relation(fields: [categoryId], references: [id], map: "Blog_categoryId_fkey")
+  image_blog_featuredImageIdToimage image?      @relation("blog_featuredImageIdToimage", fields: [featuredImageId], references: [id], map: "Blog_featuredImageId_fkey")
+  blogtag                           blogtag[]
+  image_image_blogIdToblog          image[]     @relation("image_blogIdToblog")
+
+  @@index([authorId], map: "Blog_authorId_idx")
+  @@index([categoryId], map: "Blog_categoryId_idx")
+  @@index([isFeatured], map: "Blog_isFeatured_idx")
+  @@index([publishedAt], map: "Blog_publishedAt_idx")
+  @@index([status], map: "Blog_status_idx")
+}
+
+model blogtag {
+  blogId Int
+  tagId  Int
+  blog   blog @relation(fields: [blogId], references: [id], onDelete: Cascade, map: "BlogTag_blogId_fkey")
+  tag    tag  @relation(fields: [tagId], references: [id], onDelete: Cascade, map: "BlogTag_tagId_fkey")
+
+  @@id([blogId, tagId])
+  @@index([blogId], map: "BlogTag_blogId_idx")
+  @@index([tagId], map: "BlogTag_tagId_idx")
+}
+
+model category {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique(map: "Category_name_key")
+  slug        String  @unique(map: "Category_slug_key")
+  description String? @db.Text
+  icon        String?
+  blog        blog[]
+
+  @@index([slug], map: "Category_slug_idx")
+}
+
+model comment {
+  id            Int       @id @default(autoincrement())
+  content       String    @db.LongText
+  threadId      Int
+  authorId      String
+  parentId      Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  user          user      @relation(fields: [authorId], references: [id], map: "Comment_authorId_fkey")
+  comment       comment?  @relation("commentTocomment", fields: [parentId], references: [id], map: "Comment_parentId_fkey")
+  other_comment comment[] @relation("commentTocomment")
+  thread        thread    @relation(fields: [threadId], references: [id], map: "Comment_threadId_fkey")
+  like          like[]
+
+  @@index([authorId], map: "Comment_authorId_idx")
+  @@index([parentId], map: "Comment_parentId_idx")
+  @@index([threadId], map: "Comment_threadId_idx")
+}
+
+model forum {
   id          Int      @id @default(autoincrement())
   name        String
   description String?  @db.Text
-  slug        String   @unique
+  slug        String   @unique(map: "Forum_slug_key")
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  threads     Thread[]
+  updatedAt   DateTime
+  thread      thread[]
 
-  @@index([slug])
+  @@index([slug], map: "Forum_slug_idx")
 }
 
-model Thread {
-  id        Int          @id @default(autoincrement())
-  title     String
-  content   String       @db.LongText
-  slug      String       @unique
-  forumId   Int
-  authorId  String
-  status    ThreadStatus @default(OPEN)
-  isLocked  Boolean      @default(false)
-  isPinned  Boolean      @default(false)
-  views     Int          @default(0)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  comments  Comment[]
-  likes     Like[]
-  author    User         @relation(fields: [authorId], references: [id])
-  forum     Forum        @relation(fields: [forumId], references: [id])
+model image {
+  id                               Int    @id @default(autoincrement())
+  url                              String
+  blogId                           Int?
+  blog_blog_featuredImageIdToimage blog?  @relation("blog_featuredImageIdToimage")
+  blog_image_blogIdToblog          blog?  @relation("image_blogIdToblog", fields: [blogId], references: [id], map: "Image_blogId_fkey")
 
-  @@index([forumId])
-  @@index([slug])
-  @@index([authorId])
-  @@index([status])
-  @@index([isLocked])
-  @@index([isPinned])
+  @@index([blogId], map: "Image_blogId_idx")
 }
 
-model Comment {
-  id        Int       @id @default(autoincrement())
-  content   String    @db.LongText
-  threadId  Int
-  authorId  String
-  parentId  Int?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  author    User      @relation(fields: [authorId], references: [id])
-  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
-  replies   Comment[] @relation("CommentReplies")
-  thread    Thread    @relation(fields: [threadId], references: [id])
-  likes     Like[]
-
-  @@index([threadId])
-  @@index([authorId])
-  @@index([parentId])
-}
-
-model Like {
+model like {
   id        Int      @id @default(autoincrement())
   userId    String
   threadId  Int?
   commentId Int?
   createdAt DateTime @default(now())
-  comment   Comment? @relation(fields: [commentId], references: [id])
-  thread    Thread?  @relation(fields: [threadId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  comment   comment? @relation(fields: [commentId], references: [id], map: "Like_commentId_fkey")
+  thread    thread?  @relation(fields: [threadId], references: [id], map: "Like_threadId_fkey")
+  user      user     @relation(fields: [userId], references: [id], map: "Like_userId_fkey")
 
-  @@unique([userId, threadId])
-  @@unique([userId, commentId])
-  @@index([userId])
-  @@index([threadId])
-  @@index([commentId])
+  @@unique([userId, commentId], map: "Like_userId_commentId_key")
+  @@unique([userId, threadId], map: "Like_userId_threadId_key")
+  @@index([commentId], map: "Like_commentId_idx")
+  @@index([threadId], map: "Like_threadId_idx")
+  @@index([userId], map: "Like_userId_idx")
 }
 
-model Tag {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  slug  String @unique
-  blogs BlogTag[]
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique(map: "Session_token_key")
+  ipAddress String?
+  userAgent String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Session_userId_fkey")
 
-  @@index([slug])
+  @@index([userId], map: "Session_userId_idx")
 }
 
-model Category {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  slug        String   @unique
-  description String?  @db.Text
-  icon        String?  // Optional category icon
-  blogs       Blog[]
+model tag {
+  id      Int       @id @default(autoincrement())
+  name    String    @unique(map: "Tag_name_key")
+  slug    String    @unique(map: "Tag_slug_key")
+  blogtag blogtag[]
 
-  @@index([slug])
+  @@index([slug], map: "Tag_slug_idx")
 }
 
-model BlogTag {
-  blogId Int
-  tagId  Int
-  blog   Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
-  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+model thread {
+  id        Int           @id @default(autoincrement())
+  title     String
+  content   String        @db.LongText
+  slug      String        @unique(map: "Thread_slug_key")
+  forumId   Int
+  authorId  String
+  status    thread_status @default(OPEN)
+  isLocked  Boolean       @default(false)
+  isPinned  Boolean       @default(false)
+  views     Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime
+  comment   comment[]
+  like      like[]
+  user      user          @relation(fields: [authorId], references: [id], map: "Thread_authorId_fkey")
+  forum     forum         @relation(fields: [forumId], references: [id], map: "Thread_forumId_fkey")
 
-  @@id([blogId, tagId])
-  @@index([blogId])
-  @@index([tagId])
+  @@index([authorId], map: "Thread_authorId_idx")
+  @@index([forumId], map: "Thread_forumId_idx")
+  @@index([isLocked], map: "Thread_isLocked_idx")
+  @@index([isPinned], map: "Thread_isPinned_idx")
+  @@index([slug], map: "Thread_slug_idx")
+  @@index([status], map: "Thread_status_idx")
 }
 
-model AuditLog {
-  id          Int      @id @default(autoincrement())
-  action      String   // e.g., "BAN_USER", "DELETE_THREAD", "EDIT_BLOG"
-  targetType  String   // e.g., "User", "Thread", "Blog"
-  targetId    String
-  performedBy String   // User ID of admin/mod
-  details     String?  @db.Text // JSON with additional context
-  ipAddress   String?
-  createdAt   DateTime @default(now())
-  
-  performer   User     @relation(fields: [performedBy], references: [id])
-  
-  @@index([performedBy])
-  @@index([createdAt])
-  @@index([targetType, targetId])
+model user {
+  id            String     @id
+  username      String     @unique(map: "User_username_key")
+  email         String     @unique(map: "User_email_key")
+  emailVerified Boolean    @default(false)
+  name          String?
+  avatar        String?    @db.Text
+  role          user_role  @default(USER)
+  isBanned      Boolean    @default(false)
+  bannedAt      DateTime?
+  bannedBy      String?
+  banReason     String?    @db.Text
+  bannedUntil   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime
+  account       account[]
+  auditlog      auditlog[]
+  blog          blog[]
+  comment       comment[]
+  like          like[]
+  session       session[]
+  thread        thread[]
+
+  @@index([isBanned], map: "User_isBanned_idx")
+  @@index([role], map: "User_role_idx")
+}
+
+model verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+
+  @@unique([identifier, value], map: "Verification_identifier_value_key")
+}
+
+enum blog_status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum thread_status {
+  OPEN
+  CLOSED
+  RESOLVED
+}
+
+enum user_role {
+  USER
+  MODERATOR
+  ADMIN
 }

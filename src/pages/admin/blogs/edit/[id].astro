@@ -27,7 +27,7 @@ if (!hasAdminAccess) {
 }
 
 // Prepare tags for pre-filling
-const existingTags = blog.tags.map((t: any) => t.tag.name).join(",");
+const existingTags = blog.blogtag.map((t: any) => t.tag.name).join(",");
 ---
 
 <AdminLayout title="Edit Blog">
@@ -423,9 +423,9 @@ const existingTags = blog.tags.map((t: any) => t.tag.name).join(",");
 					/>
 					<div id="image-preview" class="mb-4">
 						{
-							blog.featuredImage ? (
+							blog.image_blog_featuredImageIdToimage ? (
 								<img
-									src={blog.featuredImage.url}
+									src={blog.image_blog_featuredImageIdToimage.url}
 									alt="Preview"
 									class="max-w-full h-auto max-h-64 mx-auto rounded-lg mb-4"
 								/>
@@ -451,7 +451,7 @@ const existingTags = blog.tags.map((t: any) => t.tag.name).join(",");
 						id="upload-btn"
 						class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-300"
 					>
-						{blog.featuredImage ? "Change Image" : "Choose Image"}
+						{blog.image_blog_featuredImageIdToimage ? "Change Image" : "Choose Image"}
 					</button>
 					<p class="text-neutral-400 text-sm mt-3">
 						Upload a featured image for your blog post (JPG, PNG,
@@ -462,13 +462,13 @@ const existingTags = blog.tags.map((t: any) => t.tag.name).join(",");
 						type="hidden"
 						id="featured-image-url"
 						name="featuredImageUrl"
-						value={blog.featuredImage?.url || ""}
+						value={blog.image_blog_featuredImageIdToimage?.url || ""}
 					/>
 					<input
 						type="hidden"
 						id="featured-image-id"
 						name="featuredImageId"
-						value={blog.featuredImage?.id || ""}
+						value={blog.image_blog_featuredImageIdToimage?.id || ""}
 					/>
 					<!-- Loading spinner overlay -->
 					<div

@@ -1,18 +1,24 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { getBlogs } from "../../../lib/services/blogs";
+import { getAllCategories } from "../../../lib/services/categories";
 
 const page = Number(Astro.url.searchParams.get("page")) || 1;
 const limit = 12; // 12 works well for 2, 3, 4 column grids
 const status = Astro.url.searchParams.get("status") || "all";
 const search = Astro.url.searchParams.get("search") || "";
 const view = Astro.url.searchParams.get("view") || "table";
+const categoryId = Astro.url.searchParams.get("category") || "all";
+
+// Fetch categories for the filter dropdown
+const categories: any[] = await getAllCategories();
 
 const { blogs, total, totalPages } = await getBlogs({
 	page,
 	limit,
 	status: status === "all" ? undefined : status,
 	search,
+	categoryId: categoryId === "all" ? undefined : parseInt(categoryId),
 });
 
 const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -108,7 +114,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 				</div>
 
 				<!-- Status Filter -->
-				<div class="relative w-full sm:w-[180px]">
+				<div class="relative w-full sm:w-[140px]">
 					<select
 						name="status"
 						onchange="this.form.submit()"
@@ -143,17 +149,54 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 								stroke-linejoin="round"
 								stroke-width="2"
 								d="M19 9l-7 7-7-7"></path>
-						</svg>
+							</svg>
+						</div>
 					</div>
-				</div>
-			</form>
+
+				<!-- Category Filter -->
+				<div class="relative w-full sm:w-[160px]">
+					<select
+						name="category"
+						onchange="this.form.submit()"
+						class="block w-full pl-3 pr-10 h-10 bg-neutral-800 border border-neutral-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 appearance-none cursor-pointer hover:bg-neutral-700/50 transition-colors"
+					>
+						<option value="all" selected={categoryId === "all"}
+							>All Categories</option
+						>
+						{categories.map((cat: any) => (
+							<option
+								value={cat.id}
+								selected={categoryId === cat.id.toString()}
+							>
+								{cat.name}
+							</option>
+						))}
+					</select>
+					<div
+						class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500"
+					>
+						<svg
+							class="h-4 w-4"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 9l-7 7-7-7"></path>
+							</svg>
+						</div>
+					</div>
+				</form>
 
 			<!-- View Toggle -->
 			<div
 				class="flex items-center h-10 bg-neutral-800 p-1 rounded-xl border border-neutral-700 ring-1 ring-neutral-700/50"
 			>
 				<a
-					href={`?page=${page}&status=${status}&search=${search}&view=table`}
+					href={`?page=${page}&status=${status}&search=${search}&category=${categoryId}&view=table`}
 					class={`h-8 px-3 flex items-center justify-center rounded-lg transition-all ${view === "table" ? "bg-neutral-700 text-white shadow-lg ring-1 ring-neutral-600" : "text-neutral-500 hover:text-white hover:bg-neutral-700/50"}`}
 					title="Table View"
 				>
@@ -171,7 +214,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 					</svg>
 				</a>
 				<a
-					href={`?page=${page}&status=${status}&search=${search}&view=card`}
+					href={`?page=${page}&status=${status}&search=${search}&category=${categoryId}&view=card`}
 					class={`h-8 px-3 flex items-center justify-center rounded-lg transition-all ${view === "card" ? "bg-neutral-700 text-white shadow-lg ring-1 ring-neutral-600" : "text-neutral-500 hover:text-white hover:bg-neutral-700/50"}`}
 					title="Card View"
 				>
@@ -251,11 +294,11 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 										<td class="px-6 py-5">
 											<div class="flex items-center gap-4">
 												<div class="relative flex-shrink-0">
-													{blog.featuredImage ? (
+													{blog.image_blog_featuredImageIdToimage ? (
 														<img
 															src={
 																blog
-																	.featuredImage
+																	.image_blog_featuredImageIdToimage
 																	.url
 															}
 															alt={blog.title}
@@ -296,14 +339,14 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 										<td class="px-6 py-5">
 											<div class="flex items-center gap-3">
 												<div class="relative flex-shrink-0">
-													{blog.author?.avatar ? (
+													{blog.user?.avatar ? (
 														<img
 															src={
-																blog.author
+																blog.user
 																	.avatar
 															}
 															alt={
-																blog.author
+																blog.user
 																	.username ||
 																"User"
 															}
@@ -312,12 +355,12 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 													) : (
 														<div class="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center text-[11px] text-blue-500 font-bold ring-1 ring-blue-500/20">
 															{(
-																blog.author
+																blog.user
 																	?.username ||
 																"U"
 															)
 																.charAt(0)
-																.toUpperCase()}
+																	.toUpperCase()}
 														</div>
 													)}
 												</div>
@@ -325,7 +368,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 													class="text-neutral-300 text-sm font-medium"
 													style="font-family: 'Schibsted Grotesk', sans-serif;"
 												>
-													{blog.author?.username ||
+													{blog.user?.username ||
 														"Unknown"}
 												</span>
 											</div>
@@ -438,9 +481,9 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 					{blogs.map((blog) => (
 						<div class="group bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col h-full">
 							<div class="relative h-48 bg-neutral-800 overflow-hidden">
-								{blog.featuredImage ? (
+								{blog.image_blog_featuredImageIdToimage ? (
 									<img
-										src={blog.featuredImage.url}
+										src={blog.image_blog_featuredImageIdToimage.url}
 										alt={blog.title}
 										class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
 									/>
@@ -560,7 +603,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 					<div class="flex gap-2">
 						{page > 1 && (
 							<a
-								href={`?page=${page - 1}&status=${status}&search=${search}&view=${view}`}
+								href={`?page=${page - 1}&status=${status}&search=${search}&category=${categoryId}&view=${view}`}
 								class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors text-sm font-medium"
 							>
 								Previous
@@ -569,7 +612,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 						<div class="flex gap-1">
 							{pages.map((p) => (
 								<a
-									href={`?page=${p}&status=${status}&search=${search}&view=${view}`}
+									href={`?page=${p}&status=${status}&search=${search}&category=${categoryId}&view=${view}`}
 									class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${p === page ? "bg-blue-600 text-white" : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white"}`}
 								>
 									{p}
@@ -578,7 +621,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 						</div>
 						{page < totalPages && (
 							<a
-								href={`?page=${page + 1}&status=${status}&search=${search}&view=${view}`}
+								href={`?page=${page + 1}&status=${status}&search=${search}&category=${categoryId}&view=${view}`}
 								class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors text-sm font-medium"
 							>
 								Next

@@ -1,18 +1,130 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Newsletter from "../../components/Newsletter.astro";
 import prisma from "../../lib/prisma";
+import { getAllCategories } from "../../lib/services/categories";
 
 // Get user info for welcome message - defensive approach
 const user = (Astro.locals as any).user;
 const username = user?.username || user?.name || "Admin";
 
+// Get search and filter params from URL
+const url = new URL(Astro.request.url);
+const searchQuery = url.searchParams.get('search') || '';
+const categoryFilter = url.searchParams.get('category') || '';
+const page = parseInt(url.searchParams.get('page') || '1');
+const postsPerPage = 9;
+
+// Build where clause for filtering
+const where: any = {
+  status: 'PUBLISHED'
+};
+
+if (searchQuery) {
+  where.OR = [
+    { title: { contains: searchQuery } },
+    { excerpt: { contains: searchQuery } },
+  ];
+}
+
+if (categoryFilter) {
+  where.category = {
+    slug: categoryFilter
+  };
+}
+
+// Get featured blog (most recent featured or most viewed)
+const featuredBlog = await prisma.blog.findFirst({
+  where: {
+    status: 'PUBLISHED',
+    isFeatured: true
+  },
+  orderBy: {
+    publishedAt: 'desc'
+  },
+  include: {
+    image_blog_featuredImageIdToimage: true,
+    category: true,
+    user: {
+      select: {
+        name: true,
+        username: true,
+        avatar: true
+      }
+    }
+  }
+}) || await prisma.blog.findFirst({
+  where: { status: 'PUBLISHED' },
+  orderBy: { views: 'desc' },
+  include: {
+    image_blog_featuredImageIdToimage: true,
+    category: true,
+    user: {
+      select: {
+        name: true,
+        username: true,
+        avatar: true
+      }
+    }
+  }
+});
+
+// Get trending blogs (most viewed, excluding featured)
+const trendingBlogs = await prisma.blog.findMany({
+  where: {
+    status: 'PUBLISHED',
+    id: { not: featuredBlog?.id }
+  },
+  orderBy: { views: 'desc' },
+  take: 4,
+  include: {
+    image_blog_featuredImageIdToimage: true,
+    category: true,
+    user: {
+      select: {
+        name: true,
+        username: true,
+        avatar: true
+      }
+    }
+  }
+});
+
+// Get paginated blogs for main grid
+const skip = (page - 1) * postsPerPage;
+const totalBlogs = await prisma.blog.count({ where });
+const totalPages = Math.ceil(totalBlogs / postsPerPage);
+
 const blogs = await prisma.blog.findMany({
+  where,
+  skip,
+  take: postsPerPage,
   orderBy: {
     createdAt: "desc",
   },
   include: {
-    featuredImage: true,
+    image_blog_featuredImageIdToimage: true,
+    category: true,
+    user: {
+      select: {
+        name: true,
+        username: true,
+        avatar: true
+      }
+    }
   },
+});
+
+// Get all categories for filter dropdown and sidebar
+const categories = await getAllCategories();
+
+// Get category counts
+const categoryCounts = await prisma.category.findMany({
+  include: {
+    _count: {
+      select: { blog: true }
+    }
+  }
 });
 
 function formatDate(date: Date): string {
@@ -31,23 +143,27 @@ function formatViews(views: number): string {
   }
   return views.toString();
 }
+
+function truncateText(text: string, maxLength: number): string {
+  if (!text || text.length <= maxLength) return text || '';
+  return text.substring(0, maxLength).trim() + '...';
+}
 ---
 
 <Layout title="PL-Blogs">
-  <section
-    class="text-white px-6 lg:px-12 pb-16 lg:pb-24 pt-16 lg:pt-24 bg-neutral-900"
-  >
+  <!-- Hero / Featured Section -->
+  <section class="text-white px-6 lg:px-12 pb-8 lg:pb-12 pt-16 lg:pt-24 mt-8 lg:mt-12 bg-neutral-900">
     <div class="max-w-7xl mx-auto">
-      <div class="mb-12">
+      <div class="mb-8">
         <h2
           class="text-white mb-4"
-          style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: 113.42px; line-height: 94.64px; letter-spacing: -0.04em; vertical-align: middle;"
+          style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-style: normal; font-size: clamp(60px, 10vw, 113.42px); line-height: 0.85; letter-spacing: -0.04em; vertical-align: middle;"
         >
           {user ? `WELCOME, ${username.toUpperCase()}` : "BLOGS"}
         </h2>
         <p
           class="text-white"
-          style="font-family: 'Montserrat', sans-serif; font-weight: 600; font-style: normal; font-size: 24px; line-height: 22px; letter-spacing: -0.04em; vertical-align: middle;"
+          style="font-family: 'Montserrat', sans-serif; font-weight: 600; font-style: normal; font-size: clamp(16px, 2vw, 24px); line-height: 1.4; letter-spacing: -0.04em; vertical-align: middle;"
         >
           Explore our latest blogs and updates relating to
           <br />
@@ -55,79 +171,583 @@ function formatViews(views: number): string {
         </p>
       </div>
 
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-      >
-        {
-          blogs.map((blog: any) => (
-            <article class="bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700 flex flex-col">
-              {blog.featuredImage ? (
-                <img
-                  src={blog.featuredImage.url}
-                  alt={blog.title}
-                  class="w-full h-48 object-cover"
-                />
-              ) : (
-                <div class="w-full h-48 bg-neutral-700 flex items-center justify-center">
-                  <span class="text-neutral-500 text-sm">No Image</span>
-                </div>
-              )}
-              <div class="p-6 flex-1 flex flex-col">
-                <h3 class="text-white font-semibold text-xl mb-3">
-                  {blog.title}
-                </h3>
-                <p class="text-gray-400 text-sm mb-4 flex-1">{blog.excerpt}</p>
-                <div class="flex items-center gap-4 text-gray-500 text-xs mb-4">
-                  <span class="flex items-center gap-1">
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    {formatDate(blog.createdAt)}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                    {formatViews(blog.views)} views
-                  </span>
-                </div>
-                <a
-                  href={`/blogs/${blog.slug}`}
-                  class="border border-white text-white rounded-md py-2 px-4 hover:bg-white hover:text-black transition-colors text-sm font-medium text-center"
-                >
-                  Read more
-                </a>
-              </div>
-            </article>
-          ))
-        }
+      <!-- Search and Filter Section -->
+      <div class="mb-10">
+        <form method="GET" class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+          <!-- Search Input -->
+          <div class="flex-1">
+            <label for="search" class="block text-sm font-medium text-gray-400 mb-2">Search blogs</label>
+            <div class="relative">
+              <input
+                type="text"
+                id="search"
+                name="search"
+                value={searchQuery}
+                placeholder="Search by title or content..."
+                class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+              />
+              <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+          </div>
+          
+          <!-- Category Filter -->
+          <div class="sm:w-48">
+            <label for="category" class="block text-sm font-medium text-gray-400 mb-2">Category</label>
+            <div class="relative">
+              <select
+                id="category"
+                name="category"
+                class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none cursor-pointer pr-10"
+              >
+                <option value="">All Categories</option>
+                {categories.map((cat: any) => (
+                  <option value={cat.slug} selected={categoryFilter === cat.slug}>
+                    {cat.name} ({cat._count?.blog || 0})
+                  </option>
+                ))}
+              </select>
+              <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+          
+          <!-- Search Button -->
+          <button
+            type="submit"
+            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            Search
+          </button>
+          
+          <!-- Clear Button (only show if filters are active) -->
+          {(searchQuery || categoryFilter) && (
+            <a
+              href="/blogs"
+              class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              Clear
+            </a>
+          )}
+        </form>
       </div>
     </div>
   </section>
+
+  <!-- Featured Blog Section -->
+  {featuredBlog && !searchQuery && !categoryFilter && page === 1 && (
+    <section class="text-white px-6 lg:px-12 pb-16 bg-neutral-900">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 text-sm font-semibold rounded-full border border-yellow-500/30">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Featured
+          </span>
+        </div>
+        
+        <article class="group relative overflow-hidden rounded-2xl bg-neutral-800 border border-neutral-700 hover:border-neutral-600 transition-all duration-500">
+          <div class="grid lg:grid-cols-2 gap-0">
+            <!-- Image -->
+            <div class="relative aspect-[16/10] lg:aspect-auto overflow-hidden">
+              {featuredBlog.image_blog_featuredImageIdToimage ? (
+                <img
+                  src={featuredBlog.image_blog_featuredImageIdToimage.url}
+                  alt={featuredBlog.title}
+                  loading="eager"
+                  decoding="async"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+              ) : (
+                <div class="w-full h-full bg-gradient-to-br from-neutral-700 to-neutral-800 flex items-center justify-center">
+                  <span class="text-neutral-500 text-sm">No Image</span>
+                </div>
+              )}
+              <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/60 via-transparent to-transparent lg:bg-gradient-to-r"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-8 lg:p-12 flex flex-col justify-center">
+              {featuredBlog.category && (
+                <a 
+                  href={`/blogs?category=${featuredBlog.category.slug}`}
+                  class="inline-flex items-center gap-2 text-blue-400 text-sm font-medium mb-4 hover:text-blue-300 transition-colors"
+                >
+                  <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                  {featuredBlog.category.name}
+                </a>
+              )}
+              
+              <h3 class="text-white font-bold text-3xl lg:text-4xl mb-4 group-hover:text-blue-400 transition-colors leading-tight">
+                {featuredBlog.title}
+              </h3>
+              
+              <p class="text-gray-400 text-lg mb-6 line-clamp-3">
+                {featuredBlog.excerpt || 'No description available...'}
+              </p>
+              
+              <!-- Author & Meta -->
+              <div class="flex items-center gap-4 mb-6">
+                {featuredBlog.user?.avatar ? (
+                  <img src={featuredBlog.user.avatar} alt={featuredBlog.user.name || ''} class="w-10 h-10 rounded-full object-cover border-2 border-neutral-600" />
+                ) : (
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
+                    {(featuredBlog.user?.name || 'A').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p class="text-white font-medium text-sm">{featuredBlog.user?.name || 'Anonymous'}</p>
+                  <p class="text-gray-500 text-xs">{formatDate(featuredBlog.publishedAt || featuredBlog.createdAt)}</p>
+                </div>
+              </div>
+              
+              <!-- Stats -->
+              <div class="flex items-center gap-6 text-sm text-gray-500 mb-8">
+                <span class="flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                  {formatViews(featuredBlog.views)} views
+                </span>
+                {featuredBlog.readTime && (
+                  <span class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {featuredBlog.readTime} min read
+                  </span>
+                )}
+              </div>
+              
+              <a
+                href={`/blogs/${featuredBlog.slug}`}
+                class="inline-flex items-center gap-2 px-6 py-3 bg-white text-neutral-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors w-fit"
+              >
+                Read Article
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  )}
+
+  <!-- Trending Blogs Section -->
+  {trendingBlogs.length > 0 && !searchQuery && !categoryFilter && page === 1 && (
+    <section class="text-white px-6 lg:px-12 pb-16 bg-neutral-900">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center gap-3">
+            <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
+            </svg>
+            <h3 
+              class="text-white"
+              style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em;"
+            >
+              TRENDING NOW
+            </h3>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {trendingBlogs.map((blog: any, index: number) => (
+            <article class="group bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700 hover:border-neutral-600 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20">
+              <a href={`/blogs/${blog.slug}`} class="block">
+                <!-- Image -->
+                <div class="aspect-[16/10] overflow-hidden relative">
+                  {blog.image_blog_featuredImageIdToimage ? (
+                    <img
+                      src={blog.image_blog_featuredImageIdToimage.url}
+                      alt={blog.title}
+                      loading="lazy"
+                      decoding="async"
+                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div class="w-full h-full bg-neutral-700 flex items-center justify-center">
+                      <span class="text-neutral-500 text-sm">No Image</span>
+                    </div>
+                  )}
+                  <!-- Trending Rank -->
+                  <div class="absolute top-3 left-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                    #{index + 1}
+                  </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="p-5">
+                  {blog.category && (
+                    <span class="text-blue-400 text-xs font-medium mb-2 block">
+                      {blog.category.name}
+                    </span>
+                  )}
+                  <h4 class="text-white font-semibold text-lg mb-2 group-hover:text-blue-400 transition-colors line-clamp-2">
+                    {blog.title}
+                  </h4>
+                  <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                      {formatViews(blog.views)}
+                    </span>
+                    <span>{formatDate(blog.publishedAt || blog.createdAt)}</span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Main Content Grid with Sidebar -->
+  <section class="text-white px-6 lg:px-12 pb-16 bg-neutral-900">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-4 gap-8">
+        <!-- Main Blog Grid -->
+        <div class="lg:col-span-3">
+          <!-- Section Header -->
+          <div class="flex items-center justify-between mb-8">
+            <h3 
+              class="text-white"
+              style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em;"
+            >
+              {searchQuery ? `SEARCH RESULTS` : categoryFilter ? `CATEGORY: ${categoryFilter.toUpperCase()}` : "LATEST ARTICLES"}
+            </h3>
+            <span class="text-gray-500 text-sm">{totalBlogs} articles</span>
+          </div>
+          
+          {blogs.length === 0 ? (
+            <div class="flex flex-col items-center justify-center py-20 bg-neutral-800/50 rounded-2xl border border-neutral-700 border-dashed">
+              <svg class="w-24 h-24 text-neutral-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <h3 class="text-white text-xl font-semibold mb-2">No blogs found</h3>
+              <p class="text-neutral-400 text-center">Try adjusting your search or filter criteria</p>
+            </div>
+          ) : (
+            <>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {blogs.map((blog: any) => (
+                  <article class="group bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700 hover:border-neutral-600 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 flex flex-col">
+                    <a href={`/blogs/${blog.slug}`} class="block">
+                      <!-- Image -->
+                      <div class="aspect-[16/10] overflow-hidden">
+                        {blog.image_blog_featuredImageIdToimage ? (
+                          <img
+                            src={blog.image_blog_featuredImageIdToimage.url}
+                            alt={blog.title}
+                            loading="lazy"
+                            decoding="async"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div class="w-full h-full bg-neutral-700 flex items-center justify-center">
+                            <span class="text-neutral-500 text-sm">No Image</span>
+                          </div>
+                        )}
+                      </div>
+                    </a>
+                    
+                    <!-- Content -->
+                    <div class="p-5 flex-1 flex flex-col">
+                      <div class="flex items-center gap-2 mb-3">
+                        {blog.category && (
+                          <a 
+                            href={`/blogs?category=${blog.category.slug}`}
+                            class="inline-block px-2 py-0.5 bg-neutral-900 text-blue-400 text-xs font-semibold rounded border border-neutral-700 hover:border-blue-500/50 transition-colors"
+                          >
+                            {blog.category.name}
+                          </a>
+                        )}
+                      </div>
+                      <a href={`/blogs/${blog.slug}`}>
+                        <h3 class="text-white font-semibold text-lg mb-2 group-hover:text-blue-400 transition-colors line-clamp-2">
+                          {blog.title}
+                        </h3>
+                      </a>
+                      <p class="text-gray-400 text-sm mb-4 flex-1 line-clamp-3">{blog.excerpt}</p>
+                      
+                      <!-- Author -->
+                      <div class="flex items-center gap-3 mb-4">
+                        {blog.user?.avatar ? (
+                          <img src={blog.user.avatar} alt={blog.user.name || ''} class="w-6 h-6 rounded-full object-cover" />
+                        ) : (
+                          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-xs">
+                            {(blog.user?.name || 'A').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <span class="text-gray-500 text-xs">{blog.user?.name || 'Anonymous'}</span>
+                      </div>
+                      
+                      <!-- Meta -->
+                      <div class="flex items-center justify-between text-gray-500 text-xs pt-4 border-t border-neutral-700">
+                        <span class="flex items-center gap-1">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                          </svg>
+                          {formatDate(blog.publishedAt || blog.createdAt)}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                          </svg>
+                          {formatViews(blog.views)}
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              
+              <!-- Pagination -->
+              {totalPages > 1 && (
+                <div class="flex items-center justify-center gap-2 mt-12">
+                  <!-- Previous -->
+                  {page > 1 ? (
+                    <a
+                      href={`/blogs?page=${page - 1}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
+                      class="px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white hover:bg-neutral-700 transition-colors flex items-center gap-2"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                      </svg>
+                      Prev
+                    </a>
+                  ) : (
+                    <button disabled class="px-4 py-2 bg-neutral-800/50 border border-neutral-800 rounded-lg text-gray-600 cursor-not-allowed flex items-center gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                      </svg>
+                      Prev
+                    </button>
+                  )}
+                  
+                  <!-- Page Numbers -->
+                  <div class="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <a
+                        href={`/blogs?page=${pageNum}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
+                        class={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-colors ${
+                          pageNum === page
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-neutral-800 border border-neutral-700 text-white hover:bg-neutral-700'
+                        }`}
+                      >
+                        {pageNum}
+                      </a>
+                    ))}
+                  </div>
+                  
+                  <!-- Next -->
+                  {page < totalPages ? (
+                    <a
+                      href={`/blogs?page=${page + 1}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''}${categoryFilter ? `&category=${categoryFilter}` : ''}`}
+                      class="px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white hover:bg-neutral-700 transition-colors flex items-center gap-2"
+                    >
+                      Next
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </a>
+                  ) : (
+                    <button disabled class="px-4 py-2 bg-neutral-800/50 border border-neutral-800 rounded-lg text-gray-600 cursor-not-allowed flex items-center gap-2">
+                      Next
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        
+        <!-- Sidebar -->
+        <aside class="lg:col-span-1 space-y-8">
+          <!-- Categories Widget -->
+          <div class="bg-neutral-800 rounded-xl p-6 border border-neutral-700">
+            <h4 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+              </svg>
+              Categories
+            </h4>
+            <div class="space-y-2">
+              {categoryCounts.map((cat: any) => (
+                <a
+                  href={`/blogs?category=${cat.slug}`}
+                  class={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+                    categoryFilter === cat.slug
+                      ? 'bg-blue-600/20 border border-blue-500/30'
+                      : 'hover:bg-neutral-700 border border-transparent'
+                  }`}
+                >
+                  <span class={`text-sm ${categoryFilter === cat.slug ? 'text-blue-400 font-medium' : 'text-gray-300'}`}>
+                    {cat.name}
+                  </span>
+                  <span class="text-xs text-gray-500 bg-neutral-900 px-2 py-1 rounded-full">
+                    {cat._count.blog}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+          
+          <!-- Popular Tags Widget (if tags exist) -->
+          <div class="bg-neutral-800 rounded-xl p-6 border border-neutral-700">
+            <h4 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+              </svg>
+              Quick Links
+            </h4>
+            <div class="space-y-3">
+              <a href="/blogs" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group">
+                <span class="w-8 h-8 rounded-lg bg-neutral-700 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                  </svg>
+                </span>
+                <span class="text-sm">All Articles</span>
+              </a>
+              <a href="/forums" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group">
+                <span class="w-8 h-8 rounded-lg bg-neutral-700 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+                  </svg>
+                </span>
+                <span class="text-sm">Community</span>
+              </a>
+              <a href="/projects" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group">
+                <span class="w-8 h-8 rounded-lg bg-neutral-700 flex items-center justify-center group-hover:bg-green-600 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                  </svg>
+                </span>
+                <span class="text-sm">Projects</span>
+              </a>
+              <a href="/about-us" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group">
+                <span class="w-8 h-8 rounded-lg bg-neutral-700 flex items-center justify-center group-hover:bg-orange-600 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </span>
+                <span class="text-sm">About Us</span>
+              </a>
+            </div>
+          </div>
+          
+          <!-- Newsletter Mini Widget -->
+          <div class="bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-blue-500/20">
+            <h4 class="text-white font-semibold text-lg mb-2">Stay Updated</h4>
+            <p class="text-gray-400 text-sm mb-4">Get the latest articles delivered to your inbox.</p>
+            <a 
+              href="#newsletter" 
+              class="block w-full py-3 bg-white text-neutral-900 font-semibold rounded-lg text-center hover:bg-gray-100 transition-colors text-sm"
+            >
+              Subscribe Now
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <div id="newsletter">
+    <Newsletter />
+  </div>
 </Layout>
+
+<script>
+  // Client-side interactivity for "Read more" modal functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    // Add click handlers for read more buttons that show a preview modal
+    const readMoreLinks = document.querySelectorAll('[data-read-more]');
+    
+    readMoreLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const blogId = (e.currentTarget as HTMLElement).dataset.blogId;
+        const blogTitle = (e.currentTarget as HTMLElement).dataset.blogTitle;
+        const blogExcerpt = (e.currentTarget as HTMLElement).dataset.blogExcerpt;
+        const blogSlug = (e.currentTarget as HTMLElement).dataset.blogSlug;
+        
+        if (blogId && blogTitle && blogExcerpt) {
+          showBlogPreviewModal(blogTitle, blogExcerpt, blogSlug);
+        }
+      });
+    });
+    
+    function showBlogPreviewModal(title: string, excerpt: string, slug?: string) {
+      // Create modal
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm';
+      modal.innerHTML = `
+        <div class="bg-neutral-800 rounded-xl max-w-lg w-full p-6 border border-neutral-700 shadow-2xl transform scale-100 transition-transform">
+          <div class="flex justify-between items-start mb-4">
+            <h3 class="text-white text-xl font-semibold pr-4">${title}</h3>
+            <button class="modal-close text-gray-400 hover:text-white transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="text-gray-300 mb-6 leading-relaxed max-h-60 overflow-y-auto">
+            ${excerpt}
+          </div>
+          <div class="flex gap-3">
+            ${slug ? `
+              <a href="/blogs/${slug}" class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-center transition-colors">
+                Read Full Article
+              </a>
+            ` : ''}
+            <button class="modal-close px-4 py-3 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      document.body.style.overflow = 'hidden';
+      
+      // Close handlers
+      const closeModal = () => {
+        modal.remove();
+        document.body.style.overflow = '';
+      };
+      
+      modal.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', closeModal);
+      });
+      
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+      }, { once: true });
+    }
+  });
+</script>

@@ -1,11 +1,12 @@
 import prisma from '../prisma';
-import type { BlogStatus, Prisma } from '@prisma/client';
+import type { blog_status, Prisma } from '@prisma/client';
 
 export interface GetBlogsOptions {
     page?: number;
     limit?: number;
     status?: string;
     search?: string;
+    categoryId?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
 }
@@ -23,16 +24,22 @@ export async function getBlogs({
     limit = 10,
     status,
     search,
+    categoryId,
     sortBy = 'createdAt',
     sortOrder = 'desc'
 }: GetBlogsOptions): Promise<BlogsResult> {
     const skip = (page - 1) * limit;
 
-    const where: Prisma.BlogWhereInput = {};
+    const where: Prisma.blogWhereInput = {};
 
     // Filter by status if provided
     if (status && status !== 'all') {
-        where.status = status.toUpperCase() as BlogStatus;
+        where.status = status.toUpperCase() as blog_status;
+    }
+
+    // Filter by category if provided
+    if (categoryId) {
+        where.categoryId = categoryId;
     }
 
     // Filter by search query
@@ -40,7 +47,7 @@ export async function getBlogs({
         where.OR = [
             { title: { contains: search } }, // Case-insensitive handled by DB collation usually, or use mode: 'insensitive' for Postgres (MySQL is case-insensitive by default)
             { excerpt: { contains: search } },
-            { author: { 
+            { user: {
                 OR: [
                     { name: { contains: search } },
                     { username: { contains: search } }
@@ -61,7 +68,7 @@ export async function getBlogs({
             [sortBy]: sortOrder
         },
         include: {
-            author: {
+            user: {
                 select: {
                     id: true,
                     name: true,
@@ -70,7 +77,7 @@ export async function getBlogs({
                 }
             },
             category: true,
-            featuredImage: true
+            image_blog_featuredImageIdToimage: true
         }
     });
 
@@ -88,12 +95,12 @@ export async function getBlogById(id: number) {
     return prisma.blog.findUnique({
         where: { id },
         include: {
-            tags: {
+            blogtag: {
                 include: {
                     tag: true
                 }
             },
-            featuredImage: true
+            image_blog_featuredImageIdToimage: true
         }
     });
 }

@@ -59,6 +59,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			}))
 		} : undefined;
 
+		// Prepare blogtag data (correct relation name for Prisma schema)
+		const blogtagData = tags && Array.isArray(tags) ? {
+			create: tags.map((tagName: string) => ({
+				tag: {
+					connectOrCreate: {
+						where: { name: tagName },
+						create: {
+							name: tagName,
+							slug: tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+						}
+					}
+				}
+			}))
+		} : undefined;
+
 		// Create blog
 		const blog = await prisma.blog.create({
 			data: {
@@ -66,28 +81,29 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				slug,
 				excerpt: excerpt || '',
 				content,
-				author: {
+				user: {
 					connect: { id: user.id }
 				},
 				status: (status?.toUpperCase() as any) || 'DRAFT',
-				tags: tagsData,
+				blogtag: blogtagData,
 				// Set the featured image
-				featuredImage: isFeaturedImageIdValid ? {
+				image_blog_featuredImageIdToimage: isFeaturedImageIdValid ? {
 					connect: { id: featuredImageId }
 				} : undefined,
 				// Also add it to the general image collection for this blog
-				image: isFeaturedImageIdValid ? {
+				image_image_blogIdToblog: isFeaturedImageIdValid ? {
 					connect: [{ id: featuredImageId }]
-				} : undefined
+				} : undefined,
+				updatedAt: new Date()
 			},
 			include: {
-				featuredImage: true,
-				tags: {
+				image_blog_featuredImageIdToimage: true,
+				blogtag: {
 					include: {
 						tag: true
 					}
 				},
-				author: {
+				user: {
 					select: {
 						id: true,
 						username: true,
@@ -145,13 +161,13 @@ export const GET: APIRoute = async ({ locals }) => {
 				createdAt: 'desc'
 			},
 			include: {
-				featuredImage: true,
-				tags: {
+				image_blog_featuredImageIdToimage: true,
+				blogtag: {
 					include: {
 						tag: true
 					}
 				},
-				author: {
+				user: {
 					select: {
 						id: true,
 						username: true,

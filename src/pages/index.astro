@@ -4,6 +4,8 @@ import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
 import AboutUs from "../components/AboutUs.astro";
 import Blogs from "../components/Blogs.astro";
+import Goodies from "../components/Goodies.astro";
+import Newsletter from "../components/Newsletter.astro";
 
 // Check if admin user is accessing home page and show message
 const user = Astro.locals.user;
@@ -12,16 +14,54 @@ const showAdminMessage = isAdmin && Astro.url.searchParams.get('admin-redirect')
 ---
 
 <Layout title="Project Likha">
-	<div class="flex flex-col bg-neutral-900">
+	<div class="flex flex-col bg-neutral-900 relative overflow-hidden">
+		<!-- Animated Gradient Background -->
+		<div class="fixed inset-0 z-0 pointer-events-none">
+			<div class="absolute inset-0 bg-neutral-900"></div>
+			<div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+			<div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/15 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+			<div class="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] animate-pulse-slow" style="animation-delay: 4s;"></div>
+		</div>
+		
 		{showAdminMessage && (
-			<div class="bg-blue-600 border-b border-blue-700 px-6 py-4 text-center">
+			<div class="bg-blue-600 border-b border-blue-700 px-6 py-4 text-center relative z-10">
 				<p class="text-white">
 					🔐 You have admin privileges! You can access the <a href="/admin" class="font-semibold underline hover:text-blue-200">Admin Dashboard</a> or continue to the home page.
 				</p>
 			</div>
 		)}
-		<Hero />
-		<AboutUs />
-		<Blogs/>
+		<div class="relative z-10">
+			<Hero />
+		</div>
+		<div class="relative z-10">
+			<AboutUs />
+		</div>
+		<div class="relative z-10">
+			<Blogs/>
+		</div>
+		<div class="relative z-10">
+			<Goodies />
+		</div>
+		<div class="relative z-10">
+			<Newsletter />
+		</div>
+		<!-- Footer is rendered by Layout.astro -->
 	</div>
 </Layout>
+
+<style>
+	@keyframes pulse-slow {
+		0%, 100% {
+			opacity: 0.4;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 0.7;
+			transform: scale(1.1);
+		}
+	}
+	
+	.animate-pulse-slow {
+		animation: pulse-slow 8s ease-in-out infinite;
+	}
+</style>
