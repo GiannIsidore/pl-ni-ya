@@ -3,22 +3,23 @@ import prisma from "../lib/prisma";
 
 const blogs = await prisma.blog.findMany({
   orderBy: {
-    createdAt: 'desc', 
+    createdAt: 'desc',
   },
-  take: 5,             
+  take: 5,
   include: {
-    image_blog_featuredImageIdToimage: true,
     category: true,
+    user: true,
+    image_blog_featuredImageIdToimage: true,
   },
 })
 
 const [featuredBlog, ...smallerBlogs] = blogs as any
 
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 }
 
@@ -44,12 +45,12 @@ function truncateText(text: string, maxLength: number): string {
         BLOGS
       </h2>
       <p class="text-white" style="font-family: 'Montserrat', sans-serif; font-weight: 600; font-style: normal; font-size: 24px; line-height: 22px; letter-spacing: -0.04em; vertical-align: middle;">
-        Explore our latest blogs and updates relating to 
+        Explore our latest blogs and updates relating to
         <br>
         technology, science and many more.
       </p>
     </div>
-    
+
     {blogs.length === 0 ? (
       <div class="flex flex-col items-center justify-center py-20 scroll-fade-in">
         <svg class="w-24 h-24 text-neutral-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +82,7 @@ function truncateText(text: string, maxLength: number): string {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Content */}
                 <div class="p-6">
                   <div class="mb-3">
@@ -95,7 +96,7 @@ function truncateText(text: string, maxLength: number): string {
                   <p class="text-gray-400 text-base mb-4 line-clamp-3">
                     {featuredBlog.excerpt || 'No description available...'}
                   </p>
-                  
+
                   {/* Meta */}
                   <div class="flex items-center justify-between text-sm text-gray-500">
                     <span class="flex items-center gap-1">
@@ -112,7 +113,7 @@ function truncateText(text: string, maxLength: number): string {
                       {formatViews(featuredBlog.views || 0)} views
                     </span>
                   </div>
-                  
+
                   {/* Read more */}
                   <div class="mt-4 pt-4 border-t border-neutral-700">
                     <span class="inline-flex items-center text-sm text-white font-medium group-hover:text-blue-400 transition-colors">
@@ -166,11 +167,11 @@ function truncateText(text: string, maxLength: number): string {
         </div>
       </div>
     )}
-    
+
     {/* View All Button */}
     <div class="mt-12 text-center scroll-fade-in">
-      <a 
-        href="/blogs" 
+      <a
+        href="/blogs"
         class="inline-flex items-center gap-2 px-8 py-4 bg-white text-neutral-900 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
         style="font-family: 'Montserrat', sans-serif;"
       >
