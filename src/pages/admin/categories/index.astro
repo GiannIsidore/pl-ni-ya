@@ -20,7 +20,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 		<!-- Header -->
 		<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
 			<div>
-				<h1 class="text-2xl font-semibold text-gray-900">Categories</h1>
+				<h1 class="text-2xl font-semibold text-white">Categories</h1>
 				<p class="text-gray-500 text-sm mt-1">Organize your content with categories</p>
 			</div>
 			<button
@@ -35,7 +35,7 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 		</div>
 
 		<!-- Search & Stats -->
-		<div class="bg-white border border-gray-300 rounded-lg p-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
+		<div class="bg-base-100 border border-neutral-700 rounded-lg p-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
 			<!-- Search -->
 			<form class="flex flex-1 w-full lg:w-auto flex-col sm:flex-row gap-3 items-center" method="get">
 				<div class="flex w-full max-w-md gap-2">
@@ -50,12 +50,12 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 							name="search"
 							value={search}
 							placeholder="Search categories..."
-							class="block w-full pl-10 pr-3 h-10 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+							class="block w-full pl-10 pr-3 h-10 bg-base-100 border border-neutral-700 rounded-lg text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
 						/>
 					</div>
 					<button
 						type="submit"
-						class="px-4 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200"
+						class="px-4 h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors border border-neutral-700 cursor-pointer"
 					>
 						Search
 					</button>
@@ -73,9 +73,9 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 		<!-- Categories Grid -->
 		{
 			categories.length === 0 ? (
-				<div class="bg-white border border-gray-300 rounded-lg p-12 text-center">
-					<div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-						<svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<div class="bg-base-100 border border-neutral-700 rounded-lg p-12 text-center">
+					<div class="w-16 h-16 bg-base-100 border border-neutral-700 rounded-lg flex items-center justify-center mx-auto mb-4">
+						<svg class="w-8 h-8 text-gray-400 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -84,13 +84,13 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 							/>
 						</svg>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-900 mb-2">No categories found</h3>
+					<h3 class="text-lg font-semibold text-white mb-2">No categories found</h3>
 					<p class="text-gray-500 mb-4">
 						{search ? "Try adjusting your search terms." : "Get started by creating your first category."}
 					</p>
 					<button
 						id="create-category-btn-empty"
-						class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+						class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors cursor-pointer"
 					>
 						Create Category
 					</button>

@@ -15,6 +15,20 @@ export interface DashboardStats {
         targetType: string;
         targetId: string;
     }>;
+    recentBlogs: Array<{
+        id: string;
+        title: string;
+        author: string;
+        authorAvatar: string | null;
+        date: string;
+        status: string;
+        views: number;
+    }>;
+    weeklyStats: Array<{
+        day: string;
+        posts: number;
+        views: number;
+    }>;
     systemHealth: {
         database: string;
         uptime: string;
@@ -69,13 +83,13 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     // Note: ensure AuditLog model exists in your schema
     let recentActivity: any[] = [];
     try {
-        recentActivity = await prisma.auditLog.findMany({
+        recentActivity = await prisma.auditlog.findMany({
             take: 10,
             orderBy: {
                 createdAt: 'desc'
             },
             include: {
-                performer: {
+                user: {
                     select: {
                         username: true,
                         name: true
@@ -89,12 +103,84 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
     // Format recent activity
     const formattedActivity = recentActivity.map((log: any) => ({
-        description: `${log.performer?.username || log.performer?.name || 'Unknown User'} ${log.action.toLowerCase()} ${log.targetType} #${log.targetId}`,
+        description: `${log.user?.username || log.user?.name || 'Unknown User'} ${log.action.toLowerCase()} ${log.targetType} #${log.targetId}`,
         timestamp: new Date(log.createdAt).toLocaleString(),
         action: log.action,
         targetType: log.targetType,
         targetId: log.targetId
     }));
+
+    // Get recent blog posts with author info
+    const recentBlogsData = await prisma.blog.findMany({
+        take: 5,
+        orderBy: {
+            createdAt: 'desc'
+        },
+        include: {
+            user: {
+                select: {
+                    username: true,
+                    name: true,
+                    avatar: true
+                }
+            }
+        }
+    });
+
+    const recentBlogs = recentBlogsData.map((blog: any) => ({
+        id: blog.id,
+        title: blog.title,
+        author: blog.user?.username || blog.user?.name || 'Unknown',
+        authorAvatar: blog.user?.avatar || null,
+        date: new Date(blog.createdAt).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        }),
+        status: String(blog.status),
+        views: blog.views ?? 0
+    }));
+
+    // Get weekly stats for the graph (last 7 days)
+    const weeklyStatsData = [];
+    for (let i = 6; i >= 0; i--) {
+        const dayStart = new Date(now);
+        dayStart.setDate(dayStart.getDate() - i);
+        dayStart.setHours(0, 0, 0, 0);
+
+        const dayEnd = new Date(dayStart);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const [postsCount, viewsAgg] = await Promise.all([
+            prisma.blog.count({
+                where: {
+                    createdAt: {
+                        gte: dayStart,
+                        lte: dayEnd
+                    }
+                }
+            }),
+            prisma.blog.aggregate({
+                where: {
+                    createdAt: {
+                        gte: dayStart,
+                        lte: dayEnd
+                    }
+                },
+                _sum: {
+                    views: true
+                }
+            })
+        ]);
+
+        weeklyStatsData.push({
+            day: dayStart.toLocaleDateString('en-US', { weekday: 'short' }),
+            posts: postsCount,
+            views: viewsAgg._sum.views ?? 0
+        });
+    }
+
+    const weeklyStats = weeklyStatsData;
 
     // System health indicators
     const systemHealth = {
@@ -107,11 +193,13 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         totalUsers,
         newUsers,
         totalBlogs,
-        blogViews: blogViews._sum.views || 0,
+        blogViews: blogViews._sum.views ?? 0,
         totalThreads,
         totalComments,
         pendingModeration,
         recentActivity: formattedActivity,
+        recentBlogs,
+        weeklyStats,
         systemHealth
     };
 }

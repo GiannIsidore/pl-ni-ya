@@ -56,19 +56,13 @@ const endItem = Math.min(page * limit, total);
 ---
 
 <AdminLayout title="Create Blog">
-	<div class="max-w-4xl mx-auto pb-12">
+	<div class="max-w-5xl mx-auto pb-12">
 		<!-- Header -->
 		<div class="mb-8">
-			<h1
-				class="text-4xl font-normal text-gray-900 mb-3 tracking-tight"
-				style="font-family: 'Bebas Neue', sans-serif;"
-			>
+			<h1 class="text-4xl font-bold text-base-content mb-3">
 				Create New Blog
 			</h1>
-			<p
-				class="text-gray-500 text-lg"
-				style="font-family: 'Schibsted Grotesk', sans-serif;"
-			>
+			<p class="text-base-content/60 text-lg">
 				Write and publish a new blog post for the community.
 			</p>
 		</div>
@@ -76,13 +70,9 @@ const endItem = Math.min(page * limit, total);
 		<!-- Blog Form -->
 		<form id="blog-form" class="space-y-8">
 			<!-- Title Input -->
-			<div>
-				<label
-					for="title"
-					class="block text-gray-900 font-semibold mb-3"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
-					Blog Title
+			<div class="form-control">
+				<label for="title" class="label">
+					<span class="label-text font-semibold text-base">Blog Title</span>
 				</label>
 				<input
 					type="text"
@@ -90,323 +80,131 @@ const endItem = Math.min(page * limit, total);
 					name="title"
 					required
 					placeholder="Enter an engaging title for your blog post"
-					class="w-full px-6 py-4 bg-white border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
+					class="input input-bordered input-lg w-full bg-base-100 text-base-content placeholder:text-base-content/40"
 				/>
 			</div>
 
 			<!-- Excerpt Input -->
-			<div>
-				<label
-					for="excerpt"
-					class="block text-gray-900 font-semibold mb-3"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
-					Excerpt
+			<div class="form-control">
+				<label for="excerpt" class="label">
+					<span class="label-text font-semibold text-base">Excerpt</span>
 				</label>
 				<textarea
 					id="excerpt"
 					name="excerpt"
 					rows="3"
 					placeholder="Write a brief summary of your blog post (2-3 sentences)"
-					class="w-full px-6 py-4 bg-white border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 resize-none"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
+					class="textarea textarea-bordered w-full bg-base-100 text-base-content placeholder:text-base-content/40 resize-none"
 				></textarea>
 			</div>
 
 			<!-- Rich Text Editor -->
-			<div>
-				<label
-					for="content"
-					class="block text-gray-900 font-semibold mb-3"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
-					Content
+			<div class="form-control">
+				<label for="content" class="label">
+					<span class="label-text font-semibold text-base">Content</span>
 				</label>
 
 				<!-- Editor Toolbar -->
-				<div
-					class="bg-gray-50 border border-gray-300 rounded-t-2xl p-4 flex flex-wrap items-center gap-2 border-b-0"
-				>
+				<div class="bg-base-200 border border-base-300 rounded-t-box p-3 flex flex-wrap items-center gap-2 border-b-0">
 					<!-- Text Formatting -->
-					<div
-						class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg"
-					>
-						<button
-							type="button"
-							id="bold-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Bold"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"
-								></path>
+					<div class="join">
+						<button type="button" id="bold-btn" class="join-item btn btn-sm btn-ghost" title="Bold">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="italic-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Italic"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"
-								></path>
+						<button type="button" id="italic-btn" class="join-item btn btn-sm btn-ghost" title="Italic">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="underline-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Underline"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"
-								></path>
+						<button type="button" id="underline-btn" class="join-item btn btn-sm btn-ghost" title="Underline">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
 							</svg>
 						</button>
-						<div class="w-px h-6 bg-gray-300 mx-1"></div>
-						<button
-							type="button"
-							id="strikethrough-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Strikethrough"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"
-								></path>
+						<button type="button" id="strikethrough-btn" class="join-item btn btn-sm btn-ghost" title="Strikethrough">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/>
 							</svg>
 						</button>
 					</div>
 
 					<!-- Heading Styles -->
-					<div
-						class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg"
-					>
-						<button
-							type="button"
-							id="heading-h1-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Heading 1"
-						>
-							<span class="text-gray-700 font-bold text-sm">H1</span>
+					<div class="join">
+						<button type="button" id="heading-h1-btn" class="join-item btn btn-sm btn-ghost" title="Heading 1">
+							<span class="font-bold text-sm">H1</span>
 						</button>
-						<button
-							type="button"
-							id="heading-h2-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Heading 2"
-						>
-							<span class="text-gray-700 font-bold text-sm">H2</span>
+						<button type="button" id="heading-h2-btn" class="join-item btn btn-sm btn-ghost" title="Heading 2">
+							<span class="font-bold text-sm">H2</span>
 						</button>
-						<button
-							type="button"
-							id="heading-h3-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Heading 3"
-						>
-							<span class="text-gray-700 font-bold text-sm">H3</span>
+						<button type="button" id="heading-h3-btn" class="join-item btn btn-sm btn-ghost" title="Heading 3">
+							<span class="font-bold text-sm">H3</span>
 						</button>
 					</div>
 
 					<!-- Lists -->
-					<div
-						class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg"
-					>
-						<button
-							type="button"
-							id="ul-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Unordered List"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"
-								></path>
+					<div class="join">
+						<button type="button" id="ul-btn" class="join-item btn btn-sm btn-ghost" title="Unordered List">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="ol-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Ordered List"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.5L4 13.5v.5h2v-1H4.5L5 11.5V11H3v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"
-								></path>
+						<button type="button" id="ol-btn" class="join-item btn btn-sm btn-ghost" title="Ordered List">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.5L4 13.5v.5h2v-1H4.5L5 11.5V11H3v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/>
 							</svg>
 						</button>
 					</div>
 
 					<!-- Alignment -->
-					<div
-						class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg"
-					>
-						<button
-							type="button"
-							id="align-left-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Align Left"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M3 3h18v2H3zm0 4h12v2H3zm0 4h18v2H3zm0 4h12v2H3z"
-								></path>
+					<div class="join">
+						<button type="button" id="align-left-btn" class="join-item btn btn-sm btn-ghost" title="Align Left">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 3h18v2H3zm0 4h12v2H3zm0 4h18v2H3zm0 4h12v2H3z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="align-center-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Align Center"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M3 3h18v2H3zm3 4h12v2H6zm-3 4h18v2H3zm3 4h12v2H6z"
-								></path>
+						<button type="button" id="align-center-btn" class="join-item btn btn-sm btn-ghost" title="Align Center">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 3h18v2H3zm3 4h12v2H6zm-3 4h18v2H3zm3 4h12v2H6z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="align-right-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Align Right"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M3 3h18v2H3zm6 4h12v2H9zm-6 4h18v2H3zm6 4h12v2H9z"
-								></path>
+						<button type="button" id="align-right-btn" class="join-item btn btn-sm btn-ghost" title="Align Right">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 3h18v2H3zm6 4h12v2H9zm-6 4h18v2H3zm6 4h12v2H9z"/>
 							</svg>
 						</button>
 					</div>
 
 					<!-- Links & Media -->
-					<div
-						class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg"
-					>
-						<button
-							type="button"
-							id="link-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Insert Link"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"
-								></path>
+					<div class="join">
+						<button type="button" id="link-btn" class="join-item btn btn-sm btn-ghost" title="Insert Link">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="image-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Insert Image"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
-								></path>
+						<button type="button" id="image-btn" class="join-item btn btn-sm btn-ghost" title="Insert Image">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="code-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Code Block"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"
-								></path>
+						<button type="button" id="code-btn" class="join-item btn btn-sm btn-ghost" title="Code Block">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
 							</svg>
 						</button>
 					</div>
 
 					<!-- Other -->
-					<div
-						class="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded-lg"
-					>
-						<button
-							type="button"
-							id="quote-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Blockquote"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"
-								></path>
+					<div class="join">
+						<button type="button" id="quote-btn" class="join-item btn btn-sm btn-ghost" title="Blockquote">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
 							</svg>
 						</button>
-						<button
-							type="button"
-							id="hr-btn"
-							class="editor-btn p-2 hover:bg-gray-100 rounded transition-colors"
-							title="Horizontal Rule"
-						>
-							<svg
-								class="w-4 h-4 text-gray-700"
-								fill="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path d="M3 12h18v-2H3v2z"></path>
+						<button type="button" id="hr-btn" class="join-item btn btn-sm btn-ghost" title="Horizontal Rule">
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M3 12h18v-2H3v2z"/>
 							</svg>
 						</button>
 					</div>
@@ -416,8 +214,8 @@ const endItem = Math.min(page * limit, total);
 				<div
 					id="editor"
 					contenteditable="true"
-					class="min-h-[400px] px-6 py-4 bg-white border border-gray-300 rounded-b-2xl text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
-					style="font-family: 'Schibsted Grotesk', sans-serif; line-height: 1.6;"
+					class="min-h-[400px] px-6 py-4 bg-base-100 border border-base-300 rounded-b-box text-base-content focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+					style="line-height: 1.6;"
 					data-placeholder="Start writing your blog post..."
 				>
 				</div>
@@ -427,183 +225,85 @@ const endItem = Math.min(page * limit, total);
 			</div>
 
 			<!-- Featured Image Upload -->
-			<div>
-				<label
-					for="file-upload-input"
-					class="block text-gray-900 font-semibold mb-3"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
-					Featured Image
+			<div class="form-control">
+				<label for="file-upload-input" class="label">
+					<span class="label-text font-semibold text-base">Featured Image</span>
 				</label>
 				<div
 					id="image-upload-area"
-					class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-500 transition-colors duration-300 relative bg-white"
+					class="border-2 border-dashed border-base-300 rounded-box p-8 text-center hover:border-primary transition-colors relative bg-base-100"
 				>
-					<input
-						type="file"
-						id="file-upload-input"
-						accept="image/*"
-						class="hidden"
-					/>
+					<input type="file" id="file-upload-input" accept="image/*" class="hidden" />
 					<div id="image-preview" class="mb-4">
-						<svg
-							class="w-16 h-16 text-gray-400 mx-auto mb-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="1.5"
-								d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-							></path>
+						<svg class="w-16 h-16 text-base-content/30 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 						</svg>
 					</div>
-					<button
-						type="button"
-						id="upload-btn"
-						class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-300"
-					>
+					<button type="button" id="upload-btn" class="px-4 py-2.5 rounded-xl text-sm font-semibold admin-focus-ring transition-all hover:opacity-80" style="background: var(--admin-surface-soft);">
 						Choose Image
 					</button>
-					<p class="text-gray-500 text-sm mt-3">
-						Upload a featured image for your blog post (JPG, PNG,
-						WebP - Max 5MB)
+					<p class="text-base-content/60 text-sm mt-3">
+						Upload a featured image for your blog post (JPG, PNG, WebP - Max 5MB)
 					</p>
 					<!-- Hidden input to store the final image URL after upload -->
-					<input
-						type="hidden"
-						id="featured-image-url"
-						name="featuredImageUrl"
-						value=""
-					/>
-					<input
-						type="hidden"
-						id="featured-image-id"
-						name="featuredImageId"
-						value=""
-					/>
+					<input type="hidden" id="featured-image-url" name="featuredImageUrl" value="" />
+					<input type="hidden" id="featured-image-id" name="featuredImageId" value="" />
 					<!-- Loading spinner overlay -->
-					<div
-						id="upload-spinner"
-						class="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center rounded-2xl hidden"
-					>
-						<svg
-							class="animate-spin h-8 w-8 text-blue-600"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"></circle>
-							<path
-								class="opacity-75"
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							></path>
-						</svg>
-						<span class="text-gray-700 ml-3 text-lg"
-							>Compressing & Uploading...</span
-						>
+					<div id="upload-spinner" class="absolute inset-0 bg-base-100/90 backdrop-blur-sm flex items-center justify-center rounded-box hidden">
+						<span class="loading loading-spinner loading-lg text-primary"></span>
+						<span class="text-base-content ml-3 text-lg">Compressing & Uploading...</span>
 					</div>
 				</div>
 			</div>
 
 			<!-- Tags -->
-			<div>
-				<label
-					for="tags"
-					class="block text-gray-900 font-semibold mb-3"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
-					Tags
+			<div class="form-control">
+				<label for="tags" class="label">
+					<span class="label-text font-semibold text-base">Tags</span>
 				</label>
 				<!-- Tags Input Component -->
 				<div
 					id="tags-component-wrapper"
-					class="flex flex-wrap gap-2 items-center w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl text-gray-900 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all duration-300"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
+					class="flex flex-wrap gap-2 items-center w-full px-4 py-3 bg-base-100 border border-base-300 rounded-box text-base-content focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all"
 				>
 					<!-- Tags will be rendered here -->
 					<input
 						type="text"
 						id="tags-input-field"
 						placeholder="Enter tags (e.g., technology, programming)"
-						class="flex-grow bg-transparent border-none focus:outline-none text-gray-900 placeholder-gray-400 min-w-[100px] h-[30px]"
+						class="flex-grow bg-transparent border-none focus:outline-none text-base-content placeholder:text-base-content/40 min-w-[100px] h-[30px]"
 					/>
 					<!-- Hidden input to store comma-separated tags for form submission -->
-					<input
-						type="hidden"
-						id="tags-hidden"
-						name="tags"
-						value=""
-					/>
+					<input type="hidden" id="tags-hidden" name="tags" value="" />
 				</div>
 			</div>
 
 			<!-- Status -->
-			<div>
-				<label
-					class="block text-gray-900 font-semibold mb-3"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
-					Publish Status
+			<div class="form-control">
+				<label class="label">
+					<span class="label-text font-semibold text-base">Publish Status</span>
 				</label>
 				<div class="flex gap-4">
-					<label
-						class="flex items-center gap-3 px-6 py-3 bg-white border border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition-colors"
-					>
-						<input
-							type="radio"
-							name="status"
-							value="draft"
-							class="text-blue-600"
-							checked
-						/>
-						<span class="text-gray-900">Draft</span>
+					<label class="label cursor-pointer gap-3 bg-base-100 border border-base-300 rounded-box px-6 py-3 hover:border-primary transition-colors">
+						<input type="radio" name="status" value="draft" class="radio radio-primary" checked />
+						<span class="label-text">Draft</span>
 					</label>
-					<label
-						class="flex items-center gap-3 px-6 py-3 bg-white border border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition-colors"
-					>
-						<input
-							type="radio"
-							name="status"
-							value="published"
-							class="text-blue-600"
-						/>
-						<span class="text-gray-900">Published</span>
+					<label class="label cursor-pointer gap-3 bg-base-100 border border-base-300 rounded-box px-6 py-3 hover:border-primary transition-colors">
+						<input type="radio" name="status" value="published" class="radio radio-primary" />
+						<span class="label-text">Published</span>
 					</label>
 				</div>
 			</div>
 
 			<!-- Action Buttons -->
 			<div class="flex gap-4 pt-6">
-				<button
-					type="submit"
-					class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-300 shadow-lg hover:shadow-blue-600/25"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
+				<button type="submit" class="px-6 py-3 rounded-xl text-sm font-semibold admin-focus-ring transition-all hover:opacity-80" style="background: var(--admin-surface-soft);">
 					Publish Blog
 				</button>
-				<button
-					type="button"
-					id="save-draft-btn"
-					class="px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors duration-300"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
+				<button type="button" id="save-draft-btn" class="px-6 py-3 rounded-xl text-sm font-semibold admin-surface-soft hover:opacity-80 transition admin-focus-ring" style="border: 1px solid var(--admin-border);">
 					Save Draft
 				</button>
-				<a
-					href="/admin"
-					class="px-8 py-4 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-colors duration-300 inline-flex items-center justify-center"
-					style="font-family: 'Schibsted Grotesk', sans-serif;"
-				>
+				<a href="/admin" class="px-6 py-3 rounded-xl text-sm font-semibold admin-muted hover:opacity-80 transition admin-focus-ring">
 					Cancel
 				</a>
 			</div>
@@ -611,8 +311,8 @@ const endItem = Math.min(page * limit, total);
 
 		<!-- Blog Posts Table -->
 		<div class="mt-12">
-			<div class="flex items-center justify-between mb-6">
-				<h2 class="text-2xl font-semibold text-gray-900">Existing Blog Posts</h2>
+			<div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+				<h2 class="text-2xl font-bold text-base-content">Existing Blog Posts</h2>
 				<div class="flex items-center gap-3">
 					<form class="flex items-center gap-2" method="get">
 						<input type="hidden" name="page" value="1" />
@@ -622,16 +322,16 @@ const endItem = Math.min(page * limit, total);
 								name="search"
 								value={search}
 								placeholder="Search posts..."
-								class="pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
+								class="input input-bordered input-sm w-64 pl-9 bg-base-100 text-base-content placeholder:text-base-content/40"
 							/>
-							<svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<svg class="w-4 h-4 text-base-content/40 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
 							</svg>
 						</div>
 						<select
 							name="status"
 							onchange="this.form.submit()"
-							class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+							class="select select-bordered select-sm bg-base-100 text-base-content"
 						>
 							<option value="all" selected={status === "all"}>All Status</option>
 							<option value="published" selected={status === "published"}>Published</option>
@@ -642,30 +342,30 @@ const endItem = Math.min(page * limit, total);
 				</div>
 			</div>
 
-			{/* Table */}
-			<div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+			<!-- Table -->
+			<div class="card bg-base-100 shadow-md border border-base-300 overflow-hidden">
 				<div class="overflow-x-auto">
-					<table class="w-full text-left border-collapse">
+					<table class="table table-zebra w-full">
 						<thead>
-							<tr class="bg-gray-50 border-b border-gray-200">
-								<th class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
-								<th class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-								<th class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-								<th class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-								<th class="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Actions</th>
+							<tr class="bg-base-200">
+								<th class="text-base-content/70">Post</th>
+								<th class="text-base-content/70">Author</th>
+								<th class="text-base-content/70">Status</th>
+								<th class="text-base-content/70">Date</th>
+								<th class="text-base-content/70 text-right">Actions</th>
 							</tr>
 						</thead>
-						<tbody class="divide-y divide-gray-100">
+						<tbody>
 							{blogs.length === 0 ? (
 								<tr>
-									<td colspan="5" class="px-4 py-8 text-center text-gray-500">
+									<td colspan="5" class="text-center py-8 text-base-content/60">
 										No blog posts found. Create your first post above!
 									</td>
 								</tr>
 							) : (
 								blogs.map((blog) => (
-									<tr class="hover:bg-gray-50 transition-colors">
-										<td class="px-4 py-3">
+									<tr class="hover:bg-base-200/50">
+										<td>
 											<div class="flex items-center gap-3">
 												{blog.image_blog_featuredImageIdToimage ? (
 													<img
@@ -674,26 +374,21 @@ const endItem = Math.min(page * limit, total);
 														class="w-10 h-10 rounded-lg object-cover"
 													/>
 												) : (
-													<div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-														<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="1.5"
-																d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-															/>
+													<div class="w-10 h-10 rounded-lg bg-base-300 flex items-center justify-center">
+														<svg class="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 														</svg>
 													</div>
 												)}
 												<div class="min-w-0">
-													<p class="text-sm font-medium text-gray-900 truncate max-w-[200px]">{blog.title}</p>
-													<p class="text-xs text-gray-500 truncate max-w-[200px]">
+													<p class="font-medium text-base-content truncate max-w-[200px]">{blog.title}</p>
+													<p class="text-xs text-base-content/60 truncate max-w-[200px]">
 														{blog.excerpt || "No description..."}
 													</p>
 												</div>
 											</div>
 										</td>
-										<td class="px-4 py-3">
+										<td>
 											<div class="flex items-center gap-2">
 												{blog.user?.avatar ? (
 													<img
@@ -702,80 +397,53 @@ const endItem = Math.min(page * limit, total);
 														class="w-6 h-6 rounded-full object-cover"
 													/>
 												) : (
-													<div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs text-blue-600 font-medium">
+													<div class="w-6 h-6 rounded-full bg-info/20 flex items-center justify-center text-xs text-info font-medium">
 														{(blog.user?.username || "U").charAt(0).toUpperCase()}
 													</div>
 												)}
-												<span class="text-sm text-gray-700">{blog.user?.username || "Unknown"}</span>
-											</div>
-										</td>
-										<td class="px-4 py-3">
-											<span
-												class={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${
-													blog.status === "PUBLISHED"
-														? "bg-green-100 text-green-700"
-														: blog.status === "DRAFT"
-															? "bg-gray-100 text-gray-700"
-															: "bg-orange-100 text-orange-700"
-												}`}
-											>
-												<span
-													class={`w-1.5 h-1.5 rounded-full ${
-														blog.status === "PUBLISHED"
-															? "bg-green-500"
-															: blog.status === "DRAFT"
-																? "bg-gray-500"
-																: "bg-orange-500"
-													}`}
-												/>
-												{blog.status}
-											</span>
-										</td>
-										<td class="px-4 py-3">
-											<div class="text-sm text-gray-700">
+										<span class="text-sm text-base-content">{blog.user?.username || "Unknown"}</span>
+										</div>
+									</td>
+									<td>
+										<span class={`badge badge-sm ${blog.status === "PUBLISHED" ? "badge-success" : blog.status === "DRAFT" ? "badge-ghost" : "badge-warning"}`}>
+											{blog.status}
+										</span>
+									</td>
+										<td>
+											<div class="text-sm text-base-content">
 												{new Date(blog.createdAt).toLocaleDateString(undefined, {
 													month: "short",
 													day: "numeric",
 													year: "numeric",
 												})}
 											</div>
-											<div class="text-xs text-gray-500">
+											<div class="text-xs text-base-content/60">
 												{new Date(blog.createdAt).toLocaleTimeString(undefined, {
 													hour: "2-digit",
 													minute: "2-digit",
 												})}
 											</div>
 										</td>
-										<td class="px-4 py-3 text-right">
+										<td class="text-right">
 											<div class="flex items-center justify-end gap-1">
 												<a
 													href={`/admin/blogs/edit/${blog.id}`}
-													class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+													class="btn btn-ghost btn-xs btn-square"
 													title="Edit Post"
 												>
 													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-														/>
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
 													</svg>
 												</a>
 												<button
 													type="button"
 													data-id={blog.id}
 													data-title={blog.title}
-													class="delete-btn p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+													class="delete-btn btn btn-ghost btn-xs btn-square text-error hover:bg-error/10"
 													title="Delete Post"
 												>
 													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															stroke-width="2"
-															d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-														/>
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
 													</svg>
 												</button>
 											</div>
@@ -788,36 +456,34 @@ const endItem = Math.min(page * limit, total);
 				</div>
 			</div>
 
-			{/* Pagination */}
+			<!-- Pagination -->
 			{totalPages > 1 && (
-				<div class="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
-					<p class="text-sm text-gray-500">
-						Showing <span class="font-medium text-gray-900">{startItem}</span> to{" "}
-						<span class="font-medium text-gray-900">{endItem}</span> of{" "}
-						<span class="font-medium text-gray-900">{total}</span> results
+				<div class="flex items-center justify-between pt-4 mt-4 border-t border-base-300">
+					<p class="text-sm text-base-content/60">
+						Showing <span class="font-medium text-base-content">{startItem}</span> to{" "}
+						<span class="font-medium text-base-content">{endItem}</span> of{" "}
+						<span class="font-medium text-base-content">{total}</span> results
 					</p>
 					<div class="flex gap-2">
 						{page > 1 && (
 							<a
 								href={`?page=${page - 1}&status=${status}&search=${search}`}
-								class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+								class="btn btn-sm btn-outline"
 							>
 								Previous
 							</a>
 						)}
-						<div class="flex gap-1">
+						<div class="join">
 							{pages.map((p) => {
 								if (p === '...') {
 									return (
-										<span class="px-3 py-1.5 text-sm text-gray-400 cursor-default">...</span>
+										<span class="join-item btn btn-sm btn-disabled">...</span>
 									);
 								}
 								return (
 									<a
 										href={`?page=${p}&status=${status}&search=${search}`}
-										class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-											p === page ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-										}`}
+										class={`join-item btn btn-sm ${p === page ? "btn-primary" : "btn-outline"}`}
 									>
 										{p}
 									</a>
@@ -827,7 +493,7 @@ const endItem = Math.min(page * limit, total);
 						{page < totalPages && (
 							<a
 								href={`?page=${page + 1}&status=${status}&search=${search}`}
-								class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+								class="btn btn-sm btn-outline"
 							>
 								Next
 							</a>
@@ -836,13 +502,13 @@ const endItem = Math.min(page * limit, total);
 				</div>
 			)}
 
-			{/* Showing indicator when only one page */}
+			<!-- Showing indicator when only one page -->
 			{totalPages <= 1 && total > 0 && (
-				<div class="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
-					<p class="text-sm text-gray-500">
-						Showing <span class="font-medium text-gray-900">{startItem}</span> to{" "}
-						<span class="font-medium text-gray-900">{endItem}</span> of{" "}
-						<span class="font-medium text-gray-900">{total}</span> results
+				<div class="flex items-center justify-between pt-4 mt-4 border-t border-base-300">
+					<p class="text-sm text-base-content/60">
+						Showing <span class="font-medium text-base-content">{startItem}</span> to{" "}
+						<span class="font-medium text-base-content">{endItem}</span> of{" "}
+						<span class="font-medium text-base-content">{total}</span> results
 					</p>
 				</div>
 			)}
@@ -850,39 +516,27 @@ const endItem = Math.min(page * limit, total);
 	</div>
 
 	<!-- Delete Confirmation Modal -->
-	<dialog
-		id="delete-modal"
-		class="bg-transparent p-0 w-full h-full max-w-none max-h-none backdrop:bg-black/50 z-50 open:flex items-center justify-center fixed inset-0 hidden"
-	>
-		<div class="bg-white border border-gray-200 rounded-lg p-6 max-w-sm w-full shadow-lg relative">
-			<h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Delete</h3>
-			<p class="text-gray-600 text-sm mb-4">
-				Are you sure you want to delete <span id="delete-target-title" class="font-medium text-gray-900"></span>? This action cannot be undone.
+	<dialog id="delete-modal" class="modal">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg text-base-content">Confirm Delete</h3>
+			<p class="py-4 text-base-content/80">
+				Are you sure you want to delete <span id="delete-target-title" class="font-bold text-base-content"></span>? This action cannot be undone.
 			</p>
-			<div class="flex justify-end gap-3">
-				<button
-					id="cancel-delete"
-					class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
-				>
-					Cancel
-				</button>
-				<button
-					id="confirm-delete"
-					class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium"
-				>
-					Delete
-				</button>
+			<div class="modal-action">
+				<button id="cancel-delete" class="btn btn-ghost">Cancel</button>
+				<button id="confirm-delete" class="btn btn-error">Delete</button>
 			</div>
 		</div>
+		<form method="dialog" class="modal-backdrop">
+			<button>close</button>
+		</form>
 	</dialog>
 </AdminLayout>
 
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const editor = document.getElementById("editor") as HTMLElement;
-		const contentInput = document.getElementById(
-			"content",
-		) as HTMLInputElement;
+		const contentInput = document.getElementById("content") as HTMLInputElement;
 		const form = document.getElementById("blog-form") as HTMLFormElement;
 		const saveDraftBtn = document.getElementById("save-draft-btn");
 
@@ -921,9 +575,7 @@ const endItem = Math.min(page * limit, total);
 		underlineBtn?.addEventListener("click", () => execCommand("underline"));
 
 		// Strikethrough
-		strikethroughBtn?.addEventListener("click", () =>
-			execCommand("strikeThrough"),
-		);
+		strikethroughBtn?.addEventListener("click", () => execCommand("strikeThrough"));
 
 		/**
 		 * Toggles a block element (e.g., h1, p) on the current selection.
@@ -943,9 +595,7 @@ const endItem = Math.min(page * limit, total);
 			const closestBlock = (
 				commonAncestor.nodeType === 1
 					? (commonAncestor as Element).closest(tag)
-					: (commonAncestor.parentElement as Element | null)?.closest(
-							tag,
-						)
+					: (commonAncestor.parentElement as Element | null)?.closest(tag)
 			) as HTMLElement | null;
 
 			if (closestBlock && closestBlock.isContentEditable) {
@@ -963,23 +613,13 @@ const endItem = Math.min(page * limit, total);
 		headingH3Btn?.addEventListener("click", () => blockToggle("h3"));
 
 		// Lists
-		ulBtn?.addEventListener("click", () =>
-			execCommand("insertUnorderedList"),
-		);
-		olBtn?.addEventListener("click", () =>
-			execCommand("insertOrderedList"),
-		);
+		ulBtn?.addEventListener("click", () => execCommand("insertUnorderedList"));
+		olBtn?.addEventListener("click", () => execCommand("insertOrderedList"));
 
 		// Alignment
-		alignLeftBtn?.addEventListener("click", () =>
-			execCommand("justifyLeft"),
-		);
-		alignCenterBtn?.addEventListener("click", () =>
-			execCommand("justifyCenter"),
-		);
-		alignRightBtn?.addEventListener("click", () =>
-			execCommand("justifyRight"),
-		);
+		alignLeftBtn?.addEventListener("click", () => execCommand("justifyLeft"));
+		alignCenterBtn?.addEventListener("click", () => execCommand("justifyCenter"));
+		alignRightBtn?.addEventListener("click", () => execCommand("justifyRight"));
 
 		// Link
 		linkBtn?.addEventListener("click", () => {
@@ -1129,13 +769,32 @@ const endItem = Math.min(page * limit, total);
 
 				if (response.ok) {
 					alert("Blog created successfully!");
-					window.location.href = "/admin";
+					// Clear all form fields
+					form.reset();
+					// Clear the editor content
+					if (editor) {
+						editor.innerHTML = "";
+					}
+					// Clear tags
+					tags = [];
+					renderTags();
+					// Clear featured image
+					const imagePreview = document.getElementById("image-preview") as HTMLImageElement;
+					const imagePreviewContainer = document.getElementById("image-preview-container") as HTMLElement;
+					const imageUrlInput = document.getElementById("imageUrl") as HTMLInputElement;
+					const imageIdInput = document.getElementById("imageId") as HTMLInputElement;
+					if (imagePreview) imagePreview.src = "";
+					if (imagePreviewContainer) imagePreviewContainer.classList.add("hidden");
+					if (imageUrlInput) imageUrlInput.value = "";
+					if (imageIdInput) imageIdInput.value = "";
+					// Reset status to default
+					const statusSelect = document.getElementById("status") as HTMLSelectElement;
+					if (statusSelect) statusSelect.value = "DRAFT";
+					// Scroll to top
+					window.scrollTo(0, 0);
 				} else {
 					const error = await response.json();
-					alert(
-						"Error creating blog: " +
-							(error.error || error.message),
-					);
+					alert("Error creating blog: " + (error.error || error.message));
 					console.error("Server error:", error);
 				}
 			} catch (error) {
@@ -1145,15 +804,9 @@ const endItem = Math.min(page * limit, total);
 		});
 
 		// Tags Component Logic
-		const tagsWrapper = document.getElementById(
-			"tags-component-wrapper",
-		) as HTMLElement;
-		const tagsInputField = document.getElementById(
-			"tags-input-field",
-		) as HTMLInputElement;
-		const tagsHiddenInput = document.getElementById(
-			"tags-hidden",
-		) as HTMLInputElement;
+		const tagsWrapper = document.getElementById("tags-component-wrapper") as HTMLElement;
+		const tagsInputField = document.getElementById("tags-input-field") as HTMLInputElement;
+		const tagsHiddenInput = document.getElementById("tags-hidden") as HTMLInputElement;
 
 		let tags: string[] = [];
 
@@ -1163,16 +816,14 @@ const endItem = Math.min(page * limit, total);
 
 		const createTagElement = (tag: string) => {
 			const tagEl = document.createElement("span");
-			tagEl.className =
-				"tag-pill flex items-center bg-blue-100 text-blue-700 text-sm font-medium rounded-lg px-3 py-1 transition-colors duration-200 hover:bg-blue-200 cursor-default";
+			tagEl.className = "tag-pill flex items-center bg-primary/20 text-primary text-sm font-medium rounded-lg px-3 py-1 transition-colors hover:bg-primary/30 cursor-default";
 			tagEl.textContent = tag;
 			tagEl.dataset.tag = tag;
 
 			// Close button (X)
 			const closeBtn = document.createElement("button");
 			closeBtn.type = "button";
-			closeBtn.className =
-				"ml-2 text-blue-500 hover:text-blue-700 transition-colors duration-200 focus:outline-none";
+			closeBtn.className = "ml-2 text-primary/70 hover:text-primary transition-colors focus:outline-none";
 			closeBtn.innerHTML = `
 				<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -1309,9 +960,7 @@ const endItem = Math.min(page * limit, total);
 					alert("Draft saved successfully!");
 				} else {
 					const error = await response.json();
-					alert(
-						"Error saving draft: " + (error.error || error.message),
-					);
+					alert("Error saving draft: " + (error.error || error.message));
 					console.error("Server error:", error);
 				}
 			} catch (error) {
@@ -1321,16 +970,10 @@ const endItem = Math.min(page * limit, total);
 		});
 
 		// Image upload
-		const fileUploadInput = document.getElementById(
-			"file-upload-input",
-		) as HTMLInputElement;
+		const fileUploadInput = document.getElementById("file-upload-input") as HTMLInputElement;
 		const imagePreview = document.getElementById("image-preview");
-		const featuredImageUrlInput = document.getElementById(
-			"featured-image-url",
-		) as HTMLInputElement;
-		const featuredImageIdInput = document.getElementById(
-			"featured-image-id",
-		) as HTMLInputElement;
+		const featuredImageUrlInput = document.getElementById("featured-image-url") as HTMLInputElement;
+		const featuredImageIdInput = document.getElementById("featured-image-id") as HTMLInputElement;
 		const uploadBtn = document.getElementById("upload-btn");
 		const uploadSpinner = document.getElementById("upload-spinner");
 
@@ -1406,10 +1049,7 @@ const endItem = Math.min(page * limit, total);
 				if (id && title) {
 					blogToDelete = id;
 					if (deleteTargetTitle) deleteTargetTitle.textContent = title;
-					if (deleteModal) {
-						deleteModal.classList.remove("hidden");
-						deleteModal.showModal();
-					}
+					deleteModal?.showModal();
 				}
 			});
 		});
@@ -1417,10 +1057,7 @@ const endItem = Math.min(page * limit, total);
 		// Cancel delete
 		cancelDeleteBtn?.addEventListener("click", () => {
 			blogToDelete = null;
-			if (deleteModal) {
-				deleteModal.close();
-				deleteModal.classList.add("hidden");
-			}
+			deleteModal?.close();
 		});
 
 		// Confirm delete
@@ -1452,7 +1089,7 @@ const endItem = Math.min(page * limit, total);
 	}
 
 	#editor:focus {
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+		box-shadow: 0 0 0 2px hsl(var(--p) / 0.2);
 	}
 
 	#editor h1 {
@@ -1460,7 +1097,7 @@ const endItem = Math.min(page * limit, total);
 		font-weight: 700;
 		margin-bottom: 1rem;
 		margin-top: 1.5rem;
-		color: rgb(17 24 39);
+		color: hsl(var(--bc));
 	}
 
 	#editor h2 {
@@ -1468,7 +1105,7 @@ const endItem = Math.min(page * limit, total);
 		font-weight: 700;
 		margin-bottom: 0.75rem;
 		margin-top: 1.25rem;
-		color: rgb(17 24 39);
+		color: hsl(var(--bc));
 	}
 
 	#editor h3 {
@@ -1476,49 +1113,49 @@ const endItem = Math.min(page * limit, total);
 		font-weight: 700;
 		margin-bottom: 0.5rem;
 		margin-top: 1rem;
-		color: rgb(17 24 39);
+		color: hsl(var(--bc));
 	}
 
 	#editor ul {
 		list-style-type: disc;
 		margin-left: 1.5rem;
 		margin-bottom: 0.5rem;
-		color: rgb(55 65 81);
+		color: hsl(var(--bc) / 0.8);
 	}
 
 	#editor ol {
 		list-style-type: decimal;
 		margin-left: 1.5rem;
 		margin-bottom: 0.5rem;
-		color: rgb(55 65 81);
+		color: hsl(var(--bc) / 0.8);
 	}
 
 	#editor blockquote {
-		border-left: 4px solid rgb(59 130 246);
+		border-left: 4px solid hsl(var(--p));
 		padding-left: 1rem;
 		font-style: italic;
-		color: rgb(55 65 81);
+		color: hsl(var(--bc) / 0.8);
 		margin: 0.5rem 0;
-		background-color: rgba(59, 130, 246, 0.05);
+		background-color: hsl(var(--p) / 0.05);
 		padding: 0.5rem 1rem;
 		border-radius: 0 0.5rem 0.5rem 0;
 	}
 
 	#editor code {
-		background-color: rgb(243 244 246);
+		background-color: hsl(var(--b2));
 		padding: 0.25rem 0.5rem;
 		border-radius: 0.25rem;
-		color: rgb(220 38 38);
+		color: hsl(var(--er));
 		font-size: 0.875rem;
 	}
 
 	#editor a {
-		color: rgb(37 99 235);
+		color: hsl(var(--p));
 		text-decoration: underline;
 	}
 
 	#editor a:hover {
-		color: rgb(29 78 216);
+		color: hsl(var(--pf));
 	}
 
 	#editor img {
@@ -1529,11 +1166,11 @@ const endItem = Math.min(page * limit, total);
 	}
 
 	#editor hr {
-		border-color: rgb(209 213 219);
+		border-color: hsl(var(--bc) / 0.2);
 		margin: 1rem 0;
 	}
 
 	.editor-btn:active {
-		background-color: rgb(229 231 235);
+		background-color: hsl(var(--b2));
 	}
 </style>

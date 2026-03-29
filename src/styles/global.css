@@ -1,1 +1,62 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: light, dark, cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, halloween, garden, forest, aqua, lofi, pastel, fantasy, wireframe, black, luxury, dracula, cmyk, autumn, business, acid, lemonade, night, coffee, winter, dim, nord, sunset;
+}
+
+:root[data-theme="light"] {
+  --admin-bg: #f3f6fb;
+  --admin-bg-secondary: #e9edf6;
+  --admin-surface: #ffffff;
+  --admin-surface-soft: #f5f8ff;
+  --admin-border: #d8e1ef;
+  --admin-text: #1d293d;
+  --admin-muted: #5d6b86;
+  --admin-accent: #2563eb;
+  --admin-accent-soft: #dbeafe;
+  --admin-success: #0f766e;
+}
+
+:root[data-theme="dark"] {
+  --admin-bg: #0a0a0a;
+  --admin-bg-secondary: #111111;
+  --admin-surface: #1a1a1a;
+  --admin-surface-soft: #242424;
+  --admin-border: #2a2a2a;
+  --admin-text: #e8edf7;
+  --admin-muted: #94a3bf;
+  --admin-accent: #60a5fa;
+  --admin-accent-soft: #1e3a5f;
+  --admin-success: #34d399;
+}
+
+.admin-app-bg {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.admin-surface {
+  background: color-mix(in srgb, var(--admin-surface) 92%, transparent);
+  color: var(--admin-text);
+}
+
+.admin-surface-soft {
+  background: color-mix(in srgb, var(--admin-surface-soft) 92%, transparent);
+}
+
+.admin-muted {
+  color: var(--admin-muted);
+}
+
+.admin-accent {
+  color: var(--admin-accent);
+}
+
+.admin-focus-ring:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--admin-accent) 75%, white);
+  outline-offset: 2px;
+}
+
+.admin-glass {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}

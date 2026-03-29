@@ -2,6 +2,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { Pool as MariaPool } from "mariadb";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -9,35 +10,49 @@ if (!connectionString) {
   throw new Error("DATABASE_URL environment variable is not set");
 }
 
-// Create MySQL/MariaDB adapter with connection string
-const adapter = new PrismaMariaDb(connectionString);
+// Parse connection string and create pool with proper configuration
+const parseConnectionString = (url: string) => {
+  const parsed = new URL(url);
+  return {
+    host: parsed.hostname,
+    port: parseInt(parsed.port) || 3306,
+    user: parsed.username,
+    password: parsed.password,
+    database: parsed.pathname.slice(1),
+    connectionLimit: parseInt(parsed.searchParams.get('connection_limit') || '10'),
+    connectTimeout: parseInt(parsed.searchParams.get('connect_timeout') || '30000'),
+    poolTimeout: parseInt(parsed.searchParams.get('pool_timeout') || '30000'),
+  };
+};
+
+const poolConfig = parseConnectionString(connectionString);
+
+// Create MariaDB pool with proper settings
+const pool = new MariaPool({
+  host: poolConfig.host,
+  port: poolConfig.port,
+  user: poolConfig.user,
+  password: poolConfig.password,
+  database: poolConfig.database,
+  connectionLimit: poolConfig.connectionLimit,
+  connectTimeout: poolConfig.connectTimeout,
+  acquireTimeout: poolConfig.poolTimeout,
+  idleTimeout: 60000,
+  minimumIdle: 1,
+});
+
+// Create MySQL/MariaDB adapter with pool
+const adapter = new PrismaMariaDb(pool);
 
 // Singleton pattern to prevent multiple PrismaClient instances
-const prismaClientSingleton = () => {
-  if (globalForPrisma.prisma) {
-    return globalForPrisma.prisma;
-  }
-  
-  const client = new PrismaClient({ adapter });
-
-  // In development, store on globalThis to prevent hot-reload from creating new instances
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = client;
-  }
-
-  return client;
-};
-
 const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof prismaClientSingleton> | undefined;
+  prisma: PrismaClient | undefined;
 };
 
-// Use the singleton function to get the client
-const prisma = prismaClientSingleton();
+const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 
-// Verify Forum model exists
-if (!('forum' in prisma)) {
-  console.error('ERROR: Forum model not found in Prisma client. Please run: bunx prisma generate --config ./prisma.config.ts');
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
 }
 
 export default prisma;

@@ -117,6 +117,12 @@ const blogs = await prisma.blog.findMany({
 
 // Get all categories for filter dropdown and sidebar
 const categories = await getAllCategories();
+const activeCategory = categories.find((cat: any) => cat.slug === categoryFilter);
+const listingTitle = searchQuery
+  ? "Search Results"
+  : categoryFilter
+  ? `Category: ${activeCategory?.name || categoryFilter}`
+  : "Latest Articles";
 
 // Get category counts
 const categoryCounts = await prisma.category.findMany({
@@ -420,18 +426,35 @@ function truncateText(text: string, maxLength: number): string {
   <!-- Main Content Grid with Sidebar -->
   <section class="text-white px-6 lg:px-12 pb-16 bg-neutral-900">
     <div class="max-w-7xl mx-auto">
-      <div class="grid lg:grid-cols-4 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-8 items-start">
         <!-- Main Blog Grid -->
-        <div class="lg:col-span-3">
+        <div>
           <!-- Section Header -->
-          <div class="flex items-center justify-between mb-8">
-            <h3 
-              class="text-white"
-              style="font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em;"
-            >
-              {searchQuery ? `SEARCH RESULTS` : categoryFilter ? `CATEGORY: ${categoryFilter.toUpperCase()}` : "LATEST ARTICLES"}
-            </h3>
-            <span class="text-gray-500 text-sm">{totalBlogs} articles</span>
+          <div class="mb-8 rounded-2xl border border-neutral-700 bg-neutral-800/60 p-5 sm:p-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p class="text-xs font-semibold tracking-wider uppercase text-blue-400">Explore</p>
+                <h3 class="text-2xl sm:text-3xl font-bold text-white">{listingTitle}</h3>
+              </div>
+              <span class="inline-flex w-fit items-center rounded-full border border-neutral-600 bg-neutral-900 px-3 py-1 text-sm text-gray-300">
+                {totalBlogs} articles
+              </span>
+            </div>
+
+            {(searchQuery || categoryFilter) && (
+              <div class="mt-4 flex flex-wrap items-center gap-2">
+                {searchQuery && (
+                  <span class="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-600/15 px-3 py-1 text-xs font-medium text-blue-300">
+                    Search: {searchQuery}
+                  </span>
+                )}
+                {categoryFilter && (
+                  <span class="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-600/15 px-3 py-1 text-xs font-medium text-emerald-300">
+                    Category: {activeCategory?.name || categoryFilter}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           
           {blogs.length === 0 ? (
@@ -444,12 +467,16 @@ function truncateText(text: string, maxLength: number): string {
             </div>
           ) : (
             <>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {blogs.map((blog: any) => (
-                  <article class="group bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700 hover:border-neutral-600 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 flex flex-col">
-                    <a href={`/blogs/${blog.slug}`} class="block">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {blogs.map((blog: any, index: number) => (
+                  <article
+                    class={`group bg-neutral-800/80 rounded-2xl overflow-hidden border border-neutral-700 hover:border-neutral-500 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 flex flex-col ${
+                      index === 0 && page === 1 && !searchQuery && !categoryFilter ? "md:col-span-2" : ""
+                    }`}
+                  >
+                    <a href={`/blogs/${blog.slug}`} class="block relative">
                       <!-- Image -->
-                      <div class="aspect-[16/10] overflow-hidden">
+                      <div class={`overflow-hidden ${index === 0 && page === 1 && !searchQuery && !categoryFilter ? "aspect-[21/9]" : "aspect-[16/10]"}`}>
                         {blog.image_blog_featuredImageIdToimage ? (
                           <img
                             src={blog.image_blog_featuredImageIdToimage.url}
@@ -464,53 +491,53 @@ function truncateText(text: string, maxLength: number): string {
                           </div>
                         )}
                       </div>
+                      {blog.category && (
+                        <span class="absolute top-4 left-4 inline-flex items-center rounded-full bg-neutral-950/80 px-3 py-1 text-xs font-semibold text-blue-300 border border-neutral-700">
+                          {blog.category.name}
+                        </span>
+                      )}
                     </a>
                     
                     <!-- Content -->
-                    <div class="p-5 flex-1 flex flex-col">
-                      <div class="flex items-center gap-2 mb-3">
-                        {blog.category && (
-                          <a 
-                            href={`/blogs?category=${blog.category.slug}`}
-                            class="inline-block px-2 py-0.5 bg-neutral-900 text-blue-400 text-xs font-semibold rounded border border-neutral-700 hover:border-blue-500/50 transition-colors"
-                          >
-                            {blog.category.name}
-                          </a>
-                        )}
-                      </div>
+                    <div class="p-5 sm:p-6 flex-1 flex flex-col">
                       <a href={`/blogs/${blog.slug}`}>
-                        <h3 class="text-white font-semibold text-lg mb-2 group-hover:text-blue-400 transition-colors line-clamp-2">
+                        <h3 class={`text-white font-semibold mb-3 group-hover:text-blue-400 transition-colors line-clamp-2 ${index === 0 && page === 1 && !searchQuery && !categoryFilter ? "text-2xl" : "text-xl"}`}>
                           {blog.title}
                         </h3>
                       </a>
-                      <p class="text-gray-400 text-sm mb-4 flex-1 line-clamp-3">{blog.excerpt}</p>
-                      
+                      <p class="text-gray-400 text-sm mb-5 flex-1 leading-6 line-clamp-3">
+                        {blog.excerpt || "No description available..."}
+                      </p>
+                       
                       <!-- Author -->
                       <div class="flex items-center gap-3 mb-4">
                         {blog.user?.avatar ? (
-                          <img src={blog.user.avatar} alt={blog.user.name || ''} class="w-6 h-6 rounded-full object-cover" />
+                          <img src={blog.user.avatar} alt={blog.user.name || ''} class="w-8 h-8 rounded-full object-cover border border-neutral-600" />
                         ) : (
-                          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-xs">
+                          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-xs">
                             {(blog.user?.name || 'A').charAt(0).toUpperCase()}
                           </div>
                         )}
-                        <span class="text-gray-500 text-xs">{blog.user?.name || 'Anonymous'}</span>
+                        <div class="min-w-0">
+                          <p class="text-sm text-gray-200 truncate">{blog.user?.name || 'Anonymous'}</p>
+                          <p class="text-xs text-gray-500">Author</p>
+                        </div>
                       </div>
-                      
+                       
                       <!-- Meta -->
-                      <div class="flex items-center justify-between text-gray-500 text-xs pt-4 border-t border-neutral-700">
-                        <span class="flex items-center gap-1">
+                      <div class="mt-auto flex items-center justify-between text-gray-400 text-xs pt-4 border-t border-neutral-700">
+                        <span class="flex items-center gap-1.5">
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                           </svg>
                           {formatDate(blog.publishedAt || blog.createdAt)}
                         </span>
-                        <span class="flex items-center gap-1">
+                        <span class="flex items-center gap-1.5">
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                           </svg>
-                          {formatViews(blog.views)}
+                          {formatViews(blog.views)} views
                         </span>
                       </div>
                     </div>
@@ -583,7 +610,7 @@ function truncateText(text: string, maxLength: number): string {
         </div>
         
         <!-- Sidebar -->
-        <aside class="lg:col-span-1 space-y-8">
+        <aside class="space-y-8 lg:sticky lg:top-24">
           <!-- Categories Widget -->
           <div class="bg-neutral-800 rounded-xl p-6 border border-neutral-700">
             <h4 class="text-white font-semibold text-lg mb-4 flex items-center gap-2">
